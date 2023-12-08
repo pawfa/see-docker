@@ -1,24 +1,34 @@
-var html_value;
-var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-    styleActiveLine: true,
-    lineNumbers: true,
-    matchBrackets: true,
-    autoCloseBrackets: true,
-    autoCloseTags: true,
-    mode: "shell",
-    theme: "base16-dark",
-    extraKeys: {
-        "Enter": run
-    }
+const term = new Terminal({
+    cursorBlink: true,
+    fontFamily: 'monospace'
 });
-editor.setSize('100%', 500);
+term.open(document.getElementById('terminal'));
+term.write('user@host:/$ ')
+
+const DIR = "user@host:/$ "
+let newLine = '';
+term.onKey(function(event) {
+    if(event.key === '\x7F'){   //Backspace
+        if (newLine.length === 0) {
+        } else {
+            newLine = newLine.substring(0, newLine.length-1)
+            term.write("\b \b")
+        }
+    }else if (event.key === "\r") {
+        if (newLine === 'docker pull nginx') {
+            run();
+        }
+        term.write("\r\n")
+        term.write(DIR)
+        newLine = ''
+    } else {
+        newLine += event.key;
+        term.write(event.key)
+    }
+
+
+})
 
 function run() {
-    const lastLine = editor.lastLine();
-    html_value = editor.getLine(lastLine);
-    if (html_value === "docker pull nginx") {
-        document.querySelector("#motion-demo").classList.add("animate-image")
-    }
-    console.log(html_value)
-    return CodeMirror.Pass
+    document.querySelector("#motion-demo").classList.add("animate-image")
 }

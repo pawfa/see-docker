@@ -11,13 +11,17 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/shell/shell.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/htmlmixed/htmlmixed.js'></script>
+
+    <!-- xterm.js -->
+    <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+    <script src="node_modules/xterm/lib/xterm.js"></script>
 </head>
 <body translate="no">
 <section>
 <!--    <button onclick="run()">Run code!</button>-->
     <div class="container">
         <div class="code-container">
-            <textarea id="code" ></textarea>
+            <div id="terminal"></div>
         </div>
         <div class="result-container" style="border: 1px solid gray">
             <div id="host">
