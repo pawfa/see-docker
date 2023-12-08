@@ -1,0 +1,82 @@
+.container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+}
+.CodeMirror {
+    border: 1px solid #eee;
+    height: auto;
+    margin:0;
+}
+.CodeMirror-cursor {
+    border-left: 6px solid #b0b0b0 !important;
+}
+.code-container {
+    width: 30%
+}
+.result-container {
+    flex-grow:1
+}
+
+
+#motion-demo {
+    /*offset-path: path("M381,97 l-167,0 l1,168 l-176,-1");*/
+    width: 60px;
+    height: 60px;
+    background-image: url("https://www.nginx.com/wp-content/uploads/2021/08/NGINX-Part-of-F5-horiz-black-type-1.svg");
+    background-repeat: no-repeat;
+    transform: translate(600px,100px);
+}
+.animate-image {
+    animation: move 3000ms forwards ease-in-out;
+}
+
+#host {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border: 1px solid grey;
+    transform: translate(150px, 150px)
+}
+
+#images {
+    width: 100px;
+    height: 120px;
+    border: 1px solid grey;
+    transform: translate(10px, 90px)
+}
+
+#host-label {
+    position: absolute;
+    border: 1px solid grey;
+    border-radius: 5px;
+    background-color: white;
+    padding: 2px;
+    top:-10px;
+    left:-2px;
+}
+
+#images-label {
+    position: absolute;
+    border: 1px solid grey;
+    border-radius: 5px;
+    background-color: white;
+    padding: 2px;
+    top:-10px;
+    left:-2px;
+}
+
+@keyframes move {
+    0% {
+        transform: translate(600px,100px);
+    }
+    33% {
+        transform: translate(400px,100px);
+    }
+    66% {
+        transform: translate(400px,300px);
+    }
+    100% {
+        transform: translate(200px,300px);
+    }
+}

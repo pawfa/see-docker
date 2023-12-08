@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/theme/base16-dark.css'>
+    <link rel='stylesheet' href='styles.css'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/xml/xml.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/css/css.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/shell/shell.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/htmlmixed/htmlmixed.js'></script>
+</head>
+<body translate="no">
+<section>
+<!--    <button onclick="run()">Run code!</button>-->
+    <div class="container">
+        <div class="code-container">
+            <textarea id="code" ></textarea>
+        </div>
+        <div class="result-container" style="border: 1px solid gray">
+            <div id="host">
+                <div id="host-label">Host</div>
+                <div id="images"><div id="images-label">Images</div></div>
+            </div>
+            <div id="motion-demo"></div>
+        </div>
+    </div>
+</section>
+<script src='index.js'></script>
+
+</body>
+
+</html>
