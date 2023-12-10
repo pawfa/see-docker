@@ -15,8 +15,9 @@ class Container {
 
 
 class DockerImage {
-    constructor({position, imageSrc, animation}) {
+    constructor({position, imageSrc, animation, scale,name}) {
         this.position = {...position};
+        this.name = name;
         this.isAnimated = false;
         this.image = new Image();
         this.image.src = imageSrc;
@@ -25,9 +26,12 @@ class DockerImage {
             ...position,
             i: 0
         };
+        this.scale = scale;
+        this.id = crypto.randomUUID().replaceAll("-",'');
     }
 
-    runAnimation() {
+    runAnimation(animation) {
+        this.animation = animation;
         this.isAnimated = true;
     }
     setStatus(status) {
@@ -36,6 +40,7 @@ class DockerImage {
 
     animate() {
         if (this.animationPosition.i >= this.animation.length) {
+            this.isAnimated = false
             return;
         }
         const currentMovement = this.animation[this.animationPosition.i];
@@ -47,20 +52,24 @@ class DockerImage {
     }
 
     draw() {
+        if (this.status === 'removed') {
+            return
+        }
         if (this.status === 'running') {
-            console.log("running")
             ctx.strokeStyle = 'green'
+            ctx.font = "10px Arial";
+            ctx.fillText("RUNNING", this.position.x-5, this.position.y - 10);
         }
         if (this.status === 'exited') {
-            console.log("exited")
             ctx.strokeStyle = 'red'
+            ctx.font = "10px Arial";
+            ctx.fillText("EXITED", this.position.x-5, this.position.y - 10);
         }
         if (this.image.src) {
             const ratio = this.image.naturalWidth / this.image.naturalHeight;
-            const scale = 3;
-            const imageWidth = this.image.height / scale * ratio;
-            const imageHeight = this.image.height / scale;
-            ctx.drawImage(this.image, this.position.x, this.position.y, this.image.height / scale * ratio, this.image.height / scale);
+            const imageWidth = this.image.height / this.scale * ratio;
+            const imageHeight = this.image.height / this.scale;
+            ctx.drawImage(this.image, this.position.x, this.position.y, this.image.height / this.scale * ratio, this.image.height / this.scale);
 
             ctx.strokeRect(this.position.x - 5, this.position.y - 5, imageWidth + 10, imageHeight + 10);
             ctx.strokeStyle = 'black'
