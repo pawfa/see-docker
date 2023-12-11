@@ -28,6 +28,7 @@ class DockerImage {
         };
         this.scale = scale;
         this.id = crypto.randomUUID().replaceAll("-",'');
+        this.isHovered = false
     }
 
     runAnimation(animation) {
@@ -59,6 +60,10 @@ class DockerImage {
             ctx.strokeStyle = 'green'
             ctx.font = "10px Arial";
             ctx.fillText("RUNNING", this.position.x-5, this.position.y - 10);
+        }
+        if (this.isHovered) {
+            ctx.font = "10px Arial";
+            ctx.fillText(this.id, this.position.x-5, this.position.y + 100);
         }
         if (this.status === 'exited') {
             ctx.strokeStyle = 'red'

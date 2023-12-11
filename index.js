@@ -27,7 +27,7 @@ function handleXtermInput(event,onEnter) {
         if (newLine === '') {
             setConsoleToNewLine()
         } else {
-            onEnter()
+            onEnter(event)
         }
     } else {
         newLine += event.key;
@@ -45,7 +45,7 @@ var x = document.createElement("BUTTON");
 var t = document.createTextNode("Next");
 x.appendChild(t);
 document.body.appendChild(x);
-console.log(window.location)
+
 x.onclick = ()=>{
     const current = window.location.href;
     const currentTask = current.match(/task-\d/g)[0];

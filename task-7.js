@@ -1,3 +1,13 @@
+const registry = new Container({
+    position: {
+        x: 500,
+        y: 100,
+    },
+    width: 200,
+    height: 100,
+    label: "Registry (https://hub.docker.com)"
+});
+
 const host = new Container({
     position: {
         x: 50,
@@ -14,29 +24,6 @@ const ubuntuImage = new DockerImage({
     scale: 60,
     name: "ubuntu"
 });
-const ubuntuContainerRunning = new DockerImage({
-    position: {x: 220, y: 380},
-    imageSrc: "./img/ubuntu-logo.png",
-    scale: 60,
-    name: "ubuntu"
-});
-
-ubuntuContainerRunning.setStatus('exited');
-
-const helloWorldImage = new DockerImage({
-    position: {x: 370, y: 360},
-    imageSrc: "./img/hello-world-logo.png",
-    scale: 3,
-    name: "hello-world"
-});
-const helloWorldContainerExited = new DockerImage({
-    position: {x: 130, y: 380},
-    imageSrc: "./img/hello-world-logo.png",
-    scale: 3,
-    name: "hello-world"
-});
-helloWorldContainerExited.setStatus('exited');
-
 
 const images = new Container({
     position: {
@@ -58,8 +45,8 @@ const containers = new Container({
     label: "Containers"
 });
 
-const imagesArr = [helloWorldImage, ubuntuImage];
-const containerArr = [helloWorldContainerExited, ubuntuContainerRunning];
+const imagesArr = [ubuntuImage];
+const containerArr = [];
 
 function draw() {
     window.requestAnimationFrame(draw);
@@ -67,11 +54,10 @@ function draw() {
     host.draw();
     images.draw();
     containers.draw();
+    registry.draw();
 
     ubuntuImage.draw();
     helloWorldImage.draw();
-    helloWorldContainerExited.draw();
-    ubuntuContainerRunning.draw();
 }
 
 draw();
@@ -139,7 +125,32 @@ function taskInputHandle(event) {
         term.write(dockerContainers(["-a"]));
         setConsoleToNewLine();
     }
+
+    if (lastCommand === 'docker pull ubuntu') {
+        term.write("\r\n");
+
+        for (const logsKey in logs['docker pull ubuntu']) {
+
+            if (logsKey === '0') {
+                term.write(logs['docker pull ubuntu'][logsKey]);
+            } else {
+                setTimeout(() => {
+                    term.write(logs['docker pull ubuntu'][logsKey]);
+                    setConsoleToNewLine();
+                }, Number(logsKey));
+            }
+        }
+
+        dockerImage.runAnimation([['x', -200], ['y', 250], ['x', -225]]);
+    }
 }
+
+const logs = {
+    "docker pull ubuntu": {
+        0: "Using default tag: latest\r\nlatest: Pulling from library/ubuntu\r\n719385e32844: Waiting",
+        3000: "\033[A\33[2K\r\033[A\33[2K\rUsing default tag: latest\r\nlatest: Pulling from library/ubuntu\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ubuntu:latest\r\ndocker.io/library/ubuntuhel:latest"
+    }
+};
 
 canvas.onmousemove = function (e) {
 
