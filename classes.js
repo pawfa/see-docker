@@ -33,10 +33,16 @@ class DockerImage {
 
     runAnimation(animation) {
         this.animation = animation;
+        this.animationPosition.i = 0
         this.isAnimated = true;
     }
     setStatus(status) {
         this.status = status;
+    }
+
+    runImage() {
+        containersArr.push(this)
+        return this
     }
 
     animate() {
