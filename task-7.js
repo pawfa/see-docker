@@ -104,7 +104,6 @@ function taskInputHandle(event) {
         term.write(dockerContainers());
         setConsoleToNewLine();
     }
-    console.log(lastCommand)
 
     if (lastCommand === 'docker container prune') {
         if (isWaitingForResponse) {
@@ -130,32 +129,10 @@ function taskInputHandle(event) {
 
     if (lastCommand === 'docker pull ubuntu') {
         term.write("\r\n");
-
-        for (const logsKey in logs['docker pull ubuntu']) {
-
-            if (logsKey === '0') {
-                term.write(logs['docker pull ubuntu'][logsKey]);
-                ubuntuImage.runAnimation([['x', -200], ['y', 250]]);
-            } else {
-                setTimeout(() => {
-                    term.write(logs['docker pull ubuntu'][logsKey]);
-                    setConsoleToNewLine();
-                }, Number(logsKey));
-            }
-        }
+        ubuntuImage.pull()
     }
     if (newLine === 'docker run ubuntu') {
-        term.write("\r\n");
-
-        for (const logsKey in logs['docker run ubuntu']) {
-            setTimeout(() => {
-                term.write(logs['docker run ubuntu'][logsKey]);
-                setConsoleToNewLine();
-                ubuntuImage.setStatus('exited')
-            }, Number(logsKey));
-        }
-        ubuntuImage.runAnimation([['x', -300]]);
-        ubuntuImage.setStatus('running');
+        ubuntuImage.runImage()
     }
 }
 

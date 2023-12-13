@@ -26,9 +26,60 @@ class DockerImage {
             ...position,
             i: 0
         };
+        this.status = 'registry';
         this.scale = scale;
         this.id = crypto.randomUUID().replaceAll("-",'');
         this.isHovered = false
+        this.logs =  {
+            pull: [
+                [0, `Using default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Waiting`],
+                [3000, `\x1b[A\x1b[2K\r\x1b[A\x1b[2K\rUsing default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]
+            ],
+            run: [
+                [1000, ``],
+            ]
+        }
+    }
+    async pull() {
+        return new Promise((resolve)=> {
+            if (this.status === 'registry') {
+                for (let i = 0; i < this.logs['pull'].length; i++){
+                    const [timeout, log] = this.logs['pull'][i];
+                    if (i === 0) {
+                        term.write(log)
+                        ubuntuImage.runAnimation([['x', -200], ['y', 250]]);
+                    } else {
+                        setTimeout(() => {
+                            term.write(log);
+                            this.setStatus('downloaded')
+                            setConsoleToNewLine();
+                            resolve()
+                        }, Number(timeout));
+                    }
+                }
+            } else {
+                resolve()
+            }
+        })
+    }
+
+    async runImage() {
+        if (this.status === 'registry') {
+            await this.pull();
+        }
+        for (let i = 0; i < this.logs['run'].length; i++){
+            const [timeout, log] = this.logs['run'][i];
+            if (i === 0) {
+                ubuntuImage.runAnimation([['x', -200]]);
+            }
+            if (i === this.logs['run'].length-1) {
+                setTimeout(() => {
+                    this.setStatus('running')
+                    term.write(log);
+                }, Number(timeout));
+            }
+        }
+        containersArr.push(this)
     }
 
     runAnimation(animation) {
@@ -40,10 +91,6 @@ class DockerImage {
         this.status = status;
     }
 
-    runImage() {
-        containersArr.push(this)
-        return this
-    }
 
     animate() {
         if (this.animationPosition.i >= this.animation.length) {
