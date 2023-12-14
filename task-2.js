@@ -8,11 +8,42 @@ const host = new Container({
     label: "Host"
 });
 
-const dockerImage = new DockerImage({
+const helloWorldImage = new DockerImage({
     position: {x: 450, y: 200},
     imageSrc: "./img/hello-world-logo.png",
-    scale: 3
+    scale: 3,
+    name: 'hello-world',
+    animations: {
+        run: {movement: [['x', -200]]}
+    },
+    logs: {
+        run: [[2000, "\r\n" +
+        "Hello from Docker!\r\n" +
+        "This message shows that your installation appears to be working correctly.\r\n" +
+        "\r\n" +
+        "To generate this message, Docker took the following steps:\r\n" +
+        " 1. The Docker client contacted the Docker daemon.\r\n" +
+        " 2. The Docker daemon pulled the \"hello-world\" image from the Docker Hub.\r\n" +
+        "    (amd64)\r\n" +
+        " 3. The Docker daemon created a new container from that image which runs the\r\n" +
+        "    executable that produces the output you are currently reading.\r\n" +
+        " 4. The Docker daemon streamed that output to the Docker client, which sent it\r\n" +
+        "    to your terminal.\r\n" +
+        "\r\n" +
+        "To try something more ambitious, you can run an Ubuntu container with:\r\n" +
+        " $ docker run -it ubuntu bash\r\n" +
+        "\r\n" +
+        "Share images, automate workflows, and more with a free Docker ID:\r\n" +
+        " https://hub.docker.com/\r\n" +
+        "\r\n" +
+        "For more examples and ideas, visit:\r\n" +
+        " https://docs.docker.com/get-started/\r\n" +
+        "\r\n" +
+        "\r\n"
+        ]]
+    }
 });
+helloWorldImage.setStatus('downloaded')
 
 const images = new Container({
     position: {
@@ -42,7 +73,7 @@ function draw() {
     images.draw();
     containers.draw();
 
-    dockerImage.draw();
+    helloWorldImage.draw();
 }
 
 draw();
@@ -51,45 +82,8 @@ term.onKey(function (event) {
     handleXtermInput(event, taskInputHandle);
 });
 
-function taskInputHandle() {
+async function taskInputHandle() {
     if (newLine === 'docker run hello-world') {
-        term.write("\r\n");
-
-        for (const logsKey in logs['docker run hello-world']) {
-            setTimeout(() => {
-                term.write(logs['docker run hello-world'][logsKey]);
-                setConsoleToNewLine();
-                dockerImage.setStatus('exited')
-            }, Number(logsKey));
-        }
-        dockerImage.runAnimation([['x', -300]]);
-        dockerImage.setStatus('running');
+        await helloWorldImage.runImage()
     }
 }
-const logs = {
-    "docker run hello-world": {
-        2000: "\r\n" +
-            "Hello from Docker!\r\n" +
-            "This message shows that your installation appears to be working correctly.\r\n" +
-            "\r\n" +
-            "To generate this message, Docker took the following steps:\r\n" +
-            " 1. The Docker client contacted the Docker daemon.\r\n" +
-            " 2. The Docker daemon pulled the \"hello-world\" image from the Docker Hub.\r\n" +
-            "    (amd64)\r\n" +
-            " 3. The Docker daemon created a new container from that image which runs the\r\n" +
-            "    executable that produces the output you are currently reading.\r\n" +
-            " 4. The Docker daemon streamed that output to the Docker client, which sent it\r\n" +
-            "    to your terminal.\r\n" +
-            "\r\n" +
-            "To try something more ambitious, you can run an Ubuntu container with:\r\n" +
-            " $ docker run -it ubuntu bash\r\n" +
-            "\r\n" +
-            "Share images, automate workflows, and more with a free Docker ID:\r\n" +
-            " https://hub.docker.com/\r\n" +
-            "\r\n" +
-            "For more examples and ideas, visit:\r\n" +
-            " https://docs.docker.com/get-started/\r\n" +
-            "\r\n" +
-            "\r\n"
-    }
-};

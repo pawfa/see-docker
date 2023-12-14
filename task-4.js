@@ -19,10 +19,23 @@ const host = new Container({
     label: "Host"
 });
 
-const dockerImage = new DockerImage({
+const ubuntuImage = new DockerImage({
     position: {x: 550, y: 130},
     imageSrc: "./img/ubuntu-logo.png",
-    scale: 60
+    scale: 60,
+    name: 'ubuntu',
+    animations: {
+        pull: {
+            movement:[['x', -150], ['y', 250]]
+        },
+        run: {
+            movement: [['x', -200]],
+            timeout: 1000
+        }
+    },
+    logs: {
+        run: [[2000,'']]
+    }
 });
 
 const images = new Container({
@@ -54,40 +67,19 @@ function draw() {
     images.draw();
     containers.draw();
 
-    dockerImage.draw();
+    ubuntuImage.draw();
 }
 
 draw();
 
 term.onKey(function (event) {
     handleXtermInput(event,taskInputHandle)
+    parseDockerCommand()
 });
 
-function taskInputHandle() {
-    if (newLine === 'docker run ubuntu echo "Hello from container!"') {
+async function taskInputHandle() {
+    if (input.command === 'docker run') {
         term.write("\r\n");
-
-        for (let i = 0; i < logs['docker run ubuntu echo "Hello from container!"'].length; i++) {
-            setTimeout(() => {
-                term.write(logs['docker run ubuntu echo "Hello from container!"'][i][1]);
-                logs['docker run ubuntu echo "Hello from container!"'][i][0] === 3000 && dockerImage.setStatus('exited')
-                if (i === logs['docker run ubuntu echo "Hello from container!"'].length-1) {
-                    setConsoleToNewLine()
-                }
-            }, Number(logs['docker run ubuntu echo "Hello from container!"'][i][0]));
-        }
-        dockerImage.runAnimation([['x', -150], ['y', 300],['x', -200]]);
-        dockerImage.setStatus('running');
+        await ubuntuImage.runImage()
     }
 }
-
-const logs = {
-    'docker run ubuntu echo "Hello from container!"': [
-        [3000, "Unable to find image 'ubuntu:latest' locally\r\n" +
-        "latest: Pulling from library/ubuntu\r\n" +
-        "5e8117c0bd28: Pull complete\r\n" +
-        "Digest: sha256:8eab65df33a6de2844c9aefd19efe8ddb87b7df5e9185a4ab73af936225685bb\r\n" +
-        "Status: Downloaded newer image for ubuntu:latest\r\n" +
-        "Hello from container!\r\n"
-    ]]
-};

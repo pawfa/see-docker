@@ -1,6 +1,7 @@
 const canvas = document.querySelector("canvas");
-canvas.width = 800;
+canvas.width = 1024;
 canvas.height = 600;
+canvas.style.background = "white"
 const ctx = canvas.getContext("2d");
 
 let term = new Terminal({
@@ -15,6 +16,85 @@ term.write('user@host:/$ ');
 
 const DIR = "user@host:/$ ";
 let newLine = '';
+
+const imagesArr = [];
+const containersArr = [];
+
+let input = {
+    command: '',
+    options: [],
+    name: ''
+}
+function parseDockerCommand() {
+    console.log(newLine)
+    if (newLine.startsWith('docker rm ')) {
+        lastCommand = newLine
+    }
+    if (newLine === 'docker images') {
+        lastCommand = 'docker images'
+        input = {
+            command: 'docker images'
+        }
+    }
+    if (newLine === 'docker ps') {
+        lastCommand = 'docker ps'
+        input = {
+            command: 'docker ps'
+        }
+    }
+    if (newLine === 'docker container prune') {
+        lastCommand = 'docker container prune'
+        input = {
+            command: 'docker container prune'
+        }
+    }
+    if (newLine === 'docker ps -a') {
+        lastCommand = 'docker ps -a'
+        input = {
+            command: 'docker ps',
+            options: ["-a"]
+        }
+    }
+    if (newLine === 'docker pull ubuntu') {
+        lastCommand = 'docker pull ubuntu'
+        input = {
+            command: 'docker pull',
+            name: ["ubuntu"]
+        }
+    }
+
+    if (newLine === 'docker run') {
+        lastCommand = 'docker run'
+        input = {
+            command: 'docker run',
+            name: ["ubuntu"],
+            args: [`echo "hello from container!"`]
+        }
+    }
+}
+
+function dockerImages() {
+    const logs = ["REPOSITORY                     TAG       IMAGE ID       CREATED         SIZE"];
+    for (const dockerImage of imagesArr) {
+        logs.push(`${dockerImage.name}                         latest    ${dockerImage.id.substring(0, 11)}   9 days ago      77.8MB`);
+    }
+    return logs.join("\r\n");
+}
+
+function dockerContainers(args) {
+    const logs = ["CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS        PORTS     NAMES"];
+
+    for (const dockerImage of containersArr) {
+        if (!args) {
+            if(dockerImage.status !== 'exited'){
+                logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
+            }
+        }else if (args.includes("-a")) {
+            logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
+        }
+    }
+    return logs.join("\r\n");
+}
 
 function handleXtermInput(event,onEnter) {
     if (event.key === '\x7F') {   //Backspace
@@ -33,6 +113,7 @@ function handleXtermInput(event,onEnter) {
         newLine += event.key;
         term.write(event.key);
     }
+    parseDockerCommand()
 }
 
 function setConsoleToNewLine() {

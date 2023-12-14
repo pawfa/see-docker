@@ -7,85 +7,13 @@
     width: 40%
 }
 .right-side {
-    flex-grow:1
+
+}
+body {
+    background-color: #E5F2FC;
+    font-family: 'Roboto', sans-serif;
+}
+canvas {
+    border: 1px solid #00084D;"
 }
 
-
-#motion-demo {
-    width: 60px;
-    height: 60px;
-    background-image: url("https://www.nginx.com/wp-content/uploads/2021/08/NGINX-Part-of-F5-horiz-black-type-1.svg");
-    background-repeat: no-repeat;
-    transform: translate(500px,100px);
-}
-.animate-image {
-    animation: move 3000ms forwards ease-in-out;
-}
-
-#host {
-    position: absolute;
-    width: 220px;
-    height: 220px;
-    border: 1px solid grey;
-    transform: translate(150px, 150px)
-}
-
-#registry {
-    position: absolute;
-    width: 250px;
-    height: 120px;
-    border: 1px solid grey;
-    transform: translate(450px, 50px)
-}
-
-#registry-label {
-    position: absolute;
-    border: 1px solid grey;
-    border-radius: 5px;
-    background-color: white;
-    padding: 2px;
-    top:-10px;
-    left:-2px;
-}
-
-#images {
-    width: 100px;
-    height: 120px;
-    border: 1px solid grey;
-    transform: translate(10px, 90px)
-}
-
-#host-label {
-    position: absolute;
-    border: 1px solid grey;
-    border-radius: 5px;
-    background-color: white;
-    padding: 2px;
-    top:-10px;
-    left:-2px;
-}
-
-#images-label {
-    position: absolute;
-    border: 1px solid grey;
-    border-radius: 5px;
-    background-color: white;
-    padding: 2px;
-    top:-10px;
-    left:-2px;
-}
-
-@keyframes move {
-    0% {
-        transform: translate(500px,100px);
-    }
-    33% {
-        transform: translate(400px,100px);
-    }
-    66% {
-        transform: translate(400px,300px);
-    }
-    100% {
-        transform: translate(200px,300px);
-    }
-}

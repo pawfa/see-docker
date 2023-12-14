@@ -45,9 +45,6 @@ const containers = new Container({
     label: "Containers"
 });
 
-const imagesArr = [ubuntuImage];
-const containersArr = [];
-
 function draw() {
     window.requestAnimationFrame(draw);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -66,26 +63,9 @@ term.onKey(function (event) {
 });
 let lastCommand = ''
 let isWaitingForResponse = false;
-function taskInputHandle(event) {
-    if (newLine.startsWith('docker rm ')) {
-        lastCommand = newLine
-    }
-    if (newLine === 'docker images') {
-        lastCommand = 'docker images'
-    }
-    if (newLine === 'docker ps') {
-        lastCommand = 'docker ps'
-    }
-    if (newLine === 'docker container prune') {
-        lastCommand = 'docker container prune'
-    }
-    if (newLine === 'docker ps -a') {
-        lastCommand = 'docker ps -a'
-    }
-    if (newLine === 'docker pull ubuntu') {
-        lastCommand = 'docker pull ubuntu'
-    }
 
+
+async function taskInputHandle() {
     if (lastCommand.startsWith('docker rm ')) {
         const id = newLine.split(" ")[2];
         const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === id);
@@ -94,16 +74,7 @@ function taskInputHandle(event) {
         foundContainer.setStatus('removed');
         setConsoleToNewLine();
     }
-    if (lastCommand === 'docker images') {
-        term.write("\r\n");
-        term.write(dockerImages());
-        setConsoleToNewLine();
-    }
-    if (lastCommand === 'docker ps') {
-        term.write("\r\n");
-        term.write(dockerContainers());
-        setConsoleToNewLine();
-    }
+
 
     if (lastCommand === 'docker container prune') {
         if (isWaitingForResponse) {
@@ -129,10 +100,10 @@ function taskInputHandle(event) {
 
     if (lastCommand === 'docker pull ubuntu') {
         term.write("\r\n");
-        ubuntuImage.pull()
+        await ubuntuImage.pull()
     }
     if (newLine === 'docker run ubuntu') {
-        ubuntuImage.runImage()
+        await ubuntuImage.runImage()
     }
 }
 
@@ -183,25 +154,3 @@ canvas.onmousemove = function (e) {
     }
 };
 
-function dockerImages() {
-    const logs = ["REPOSITORY                     TAG       IMAGE ID       CREATED         SIZE"];
-    for (const dockerImage of imagesArr) {
-        logs.push(`${dockerImage.name}                         latest    ${dockerImage.id.substring(0, 11)}   9 days ago      77.8MB`);
-    }
-    return logs.join("\r\n");
-}
-
-function dockerContainers(args) {
-    const logs = ["CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS        PORTS     NAMES"];
-
-    for (const dockerImage of containerArr) {
-        if (!args) {
-            if(dockerImage.status !== 'exited'){
-                logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
-            }
-        }else if (args.includes("-a")) {
-            logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
-        }
-    }
-    return logs.join("\r\n");
-}
