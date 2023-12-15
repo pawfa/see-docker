@@ -14,14 +14,15 @@ const ubuntuImage = new DockerImage({
     scale: 60,
     name: "ubuntu"
 });
+imagesArr.push(ubuntuImage)
 const ubuntuContainerRunning = new DockerImage({
     position: {x: 220, y: 380},
     imageSrc: "./img/ubuntu-logo.png",
     scale: 60,
     name: "ubuntu"
 });
-
-ubuntuContainerRunning.setStatus('exited');
+containersArr.push(ubuntuContainerRunning)
+ubuntuContainerRunning.setStatus('running');
 
 const helloWorldImage = new DockerImage({
     position: {x: 370, y: 360},
@@ -29,12 +30,14 @@ const helloWorldImage = new DockerImage({
     scale: 3,
     name: "hello-world"
 });
+imagesArr.push(helloWorldImage)
 const helloWorldContainerExited = new DockerImage({
     position: {x: 130, y: 380},
     imageSrc: "./img/hello-world-logo.png",
     scale: 3,
     name: "hello-world"
 });
+containersArr.push(helloWorldContainerExited)
 helloWorldContainerExited.setStatus('exited');
 
 
@@ -45,7 +48,10 @@ const images = new Container({
     },
     width: 200,
     height: 200,
-    label: "Images"
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
 });
 
 const containers = new Container({
@@ -55,11 +61,11 @@ const containers = new Container({
     },
     width: 200,
     height: 200,
-    label: "Containers"
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
 });
-
-const imagesArr = [helloWorldImage, ubuntuImage];
-const containerArr = [helloWorldContainerExited, ubuntuContainerRunning];
 
 function draw() {
     window.requestAnimationFrame(draw);
@@ -82,25 +88,9 @@ term.onKey(function (event) {
 let lastCommand = ''
 let isWaitingForResponse = false;
 function taskInputHandle(event) {
-    if (newLine.startsWith('docker rm ')) {
-        lastCommand = newLine
-    }
-    if (newLine === 'docker images') {
-        lastCommand = 'docker images'
-    }
-    if (newLine === 'docker ps') {
-        lastCommand = 'docker ps'
-    }
-    if (newLine === 'docker container prune') {
-        lastCommand = 'docker container prune'
-    }
-    if (newLine === 'docker ps -a') {
-        lastCommand = 'docker ps -a'
-    }
-
     if (lastCommand.startsWith('docker rm ')) {
         const id = newLine.split(" ")[2];
-        const foundContainer = containerArr.find((container) => container.id.substring(0, 11) === id);
+        const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === id);
         term.write("\r\n");
         term.write(id);
         foundContainer.setStatus('removed');
@@ -116,11 +106,10 @@ function taskInputHandle(event) {
         term.write(dockerContainers());
         setConsoleToNewLine();
     }
-    console.log(lastCommand)
 
     if (lastCommand === 'docker container prune') {
         if (isWaitingForResponse) {
-            for (const dockerImage of containerArr) {
+            for (const dockerImage of containersArr) {
                 term.write("\r\n");
                 term.write(dockerImage.id);
                 dockerImage.setStatus('removed');
@@ -134,47 +123,11 @@ function taskInputHandle(event) {
             isWaitingForResponse = true
         }
     }
-    if (lastCommand === 'docker ps -a') {
+    if (lastCommand === 'docker ps') {
         term.write("\r\n");
-        term.write(dockerContainers(["-a"]));
+        term.write(dockerContainers());
         setConsoleToNewLine();
     }
 }
 
-canvas.onmousemove = function (e) {
 
-    var rect = this.getBoundingClientRect(),
-        x = e.clientX - rect.left,
-        y = e.clientY - rect.top;
-    for (const image of [...containerArr, ...imagesArr]) {
-        ctx.fillText(image.id, image.position.x, image.position.y);
-        if (x > image.position.x && x < image.position.x + 50 && y > image.position.y && y < image.position.y + 50) {
-            image.isHovered = true;
-        } else if (image.isHovered) {
-            image.isHovered = false;
-        }
-    }
-};
-
-function dockerImages() {
-    const logs = ["REPOSITORY                     TAG       IMAGE ID       CREATED         SIZE"];
-    for (const dockerImage of imagesArr) {
-        logs.push(`${dockerImage.name}                         latest    ${dockerImage.id.substring(0, 11)}   9 days ago      77.8MB`);
-    }
-    return logs.join("\r\n");
-}
-
-function dockerContainers(args) {
-    const logs = ["CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS        PORTS     NAMES"];
-
-    for (const dockerImage of containerArr) {
-        if (!args) {
-            if(dockerImage.status !== 'exited'){
-                logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
-            }
-        }else if (args.includes("-a")) {
-            logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
-        }
-    }
-    return logs.join("\r\n");
-}

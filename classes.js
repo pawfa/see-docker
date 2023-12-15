@@ -58,6 +58,17 @@ class DockerImage {
             ],
             ...logs
         };
+        canvas.addEventListener('mousemove', (e)=> {
+            const rect = canvas.getBoundingClientRect(),
+                x = e.clientX - rect.left,
+                y = e.clientY - rect.top;
+
+            if (x > this.position.x && x < this.position.x + 50 && y > this.position.y && y < this.position.y + 50) {
+                this.isHovered = true;
+            } else if (this.isHovered) {
+                this.isHovered = false;
+            }
+        })
     }
 
     getPullLogs() {
@@ -189,6 +200,7 @@ class DockerImage {
         }
         this.position[currentMovement[0]] = currentMovement[1] > 0 ? this.position[currentMovement[0]] + 4 : this.position[currentMovement[0]] - 4;
     }
+    count = 0;
 
     draw() {
         ctx.strokeStyle = '#00084D';
@@ -198,14 +210,24 @@ class DockerImage {
         if (this.status === 'running') {
             ctx.strokeStyle = 'green';
             ctx.save();
+            if (this.count ===3) {
+                this.count = 0
+            }
+
             ctx.font = "10px Roboto";
             ctx.fillStyle = 'green';
+            for (let i = 0; i < this.count; i++) {
+                ctx.fillText(".", this.position.x +50+this.count, this.position.y - 10);
+            }
             ctx.fillText("RUNNING", this.position.x - 5, this.position.y - 10);
             ctx.restore();
         }
         if (this.isHovered) {
+            ctx.save()
             ctx.font = "10px Roboto";
+            ctx.fillStyle = 'black'
             ctx.fillText(this.id, this.position.x - 5, this.position.y + 100);
+            ctx.restore()
         }
         if (this.status === 'exited') {
             ctx.strokeStyle = 'red';

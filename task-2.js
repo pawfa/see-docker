@@ -52,7 +52,10 @@ const images = new Container({
     },
     width: 200,
     height: 200,
-    label: "Images"
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
 });
 
 const containers = new Container({
@@ -62,7 +65,10 @@ const containers = new Container({
     },
     width: 200,
     height: 200,
-    label: "Containers"
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
 });
 
 

@@ -81,15 +81,16 @@ function dockerImages() {
     return logs.join("\r\n");
 }
 
-function dockerContainers(args) {
+function dockerContainers() {
     const logs = ["CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS        PORTS     NAMES"];
 
     for (const dockerImage of containersArr) {
-        if (!args) {
+        if (!input.options) {
             if(dockerImage.status !== 'exited'){
                 logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
             }
-        }else if (args.includes("-a")) {
+        }else if (input.options.includes("-a")) {
+
             logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}     "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
         }
     }

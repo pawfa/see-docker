@@ -45,7 +45,10 @@ const images = new Container({
     },
     width: 200,
     height: 200,
-    label: "Images"
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
 });
 
 const containers = new Container({
@@ -55,7 +58,10 @@ const containers = new Container({
     },
     width: 200,
     height: 200,
-    label: "Containers"
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
 });
 
 imagesArr.push(helloWorldImage, ubuntuImage)
@@ -81,12 +87,12 @@ term.onKey(function (event) {
 });
 
 function taskInputHandle() {
-    if (lastCommand === 'docker images') {
+    if (input.command === 'docker images') {
         term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();
     }
-    if (lastCommand === 'docker ps') {
+    if (input.command === 'docker ps') {
         term.write("\r\n");
         term.write(dockerContainers());
         setConsoleToNewLine();

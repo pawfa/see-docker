@@ -138,19 +138,3 @@ const logs = {
             "\r\n"
     }
 };
-
-canvas.onmousemove = function (e) {
-
-    var rect = this.getBoundingClientRect(),
-        x = e.clientX - rect.left,
-        y = e.clientY - rect.top;
-    for (const image of [...containersArr, ...imagesArr]) {
-        ctx.fillText(image.id, image.position.x, image.position.y);
-        if (x > image.position.x && x < image.position.x + 50 && y > image.position.y && y < image.position.y + 50) {
-            image.isHovered = true;
-        } else if (image.isHovered) {
-            image.isHovered = false;
-        }
-    }
-};
-
