@@ -129,8 +129,15 @@ x.appendChild(t);
 document.body.appendChild(x);
 
 x.onclick = ()=>{
-    const current = window.location.href;
-    const currentTask = current.match(/task-\d/g)[0];
-    const taskNo = currentTask[currentTask.length-1];
-    window.location.href = current.substring(0, current.length - 6) + `${Number(taskNo)+1}.html`
+    const pathName = window.location.pathname;
+    const currentTask = pathName.match(/task-\d/g)?.[0];
+    const taskNo = !currentTask ? 1 :currentTask[currentTask.length-1];
+    if (Number(taskNo) === 7) {
+        return
+    }
+    const pathsSplitted = pathName.split("/")
+    pathsSplitted.splice(-1)
+    const path = pathsSplitted.filter(Boolean).join("/")
+
+    window.location.href = `${window.location.origin}/${path}/task-${Number(taskNo)+1}.html`
 }
