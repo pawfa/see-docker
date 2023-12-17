@@ -86,7 +86,7 @@ term.onKey(function (event) {
     handleXtermInput(event, taskInputHandle);
 });
 let lastCommand = ''
-let isWaitingForResponse = false;
+
 function taskInputHandle(event) {
     if (input.command === 'rm') {
         const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === input.name);

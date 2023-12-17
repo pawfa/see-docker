@@ -71,7 +71,6 @@ term.onKey(function (event) {
     handleXtermInput(event, taskInputHandle);
 });
 let lastCommand = ''
-let isWaitingForResponse = false;
 
 
 async function taskInputHandle() {

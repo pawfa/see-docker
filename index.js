@@ -14,9 +14,22 @@ let term = new Terminal({
 term.open(document.getElementById('terminal'));
 term.write('user@host:/$ ');
 
+term.attachCustomKeyEventHandler((arg) => {
+    if (arg.ctrlKey && arg.code === "KeyV" && arg.type === "keydown") {
+        navigator.clipboard.readText()
+            .then(text => {
+                term.write(text);
+            })
+    };
+    if (arg.ctrlKey && arg.code === "KeyC" && arg.type === "keydown") {
+        setConsoleToNewLine()
+    }
+    return true;
+});
 
 const DIR = "user@host:/$ ";
 let newLine = '';
+let isWaitingForResponse = false;
 
 const imagesArr = [];
 const containersArr = [];
