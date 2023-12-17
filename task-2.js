@@ -44,6 +44,7 @@ const helloWorldImage = new DockerImage({
     }
 });
 helloWorldImage.setStatus('downloaded')
+imagesArr.push(helloWorldImage)
 
 const images = new Container({
     position: {
@@ -89,7 +90,13 @@ term.onKey(function (event) {
 });
 
 async function taskInputHandle() {
-    if (newLine === 'docker run hello-world') {
-        await helloWorldImage.runImage()
+    if (input.command === 'run') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            await img.runImage()
+        } else {
+            setConsoleToNewLine()
+        }
     }
 }

@@ -39,6 +39,7 @@ const registry = new Container({
     height: 100,
     label: "Registry (https://hub.docker.com)"
 });
+imagesArr.push(helloWorldImage)
 
 
 function draw() {
@@ -58,9 +59,14 @@ term.onKey(function (event) {
 });
 
 function taskInputHandle() {
-    if (newLine === 'docker pull hello-world') {
-        term.write("\r\n");
-        helloWorldImage.pull()
+    if (input.command === 'pull') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            img.pull()
+        } else {
+            setConsoleToNewLine()
+        }
     }
 }
 

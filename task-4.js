@@ -37,6 +37,7 @@ const ubuntuImage = new DockerImage({
         run: [[2000,'']]
     }
 });
+imagesArr.push(ubuntuImage)
 
 const images = new Container({
     position: {
@@ -80,12 +81,16 @@ draw();
 
 term.onKey(function (event) {
     handleXtermInput(event,taskInputHandle)
-    parseDockerCommand()
 });
 
 async function taskInputHandle() {
-    if (input.command === 'docker run') {
-        term.write("\r\n");
-        await ubuntuImage.runImage()
+    if (input.command === 'run') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            await img.runImage()
+        } else {
+            setConsoleToNewLine()
+        }
     }
 }

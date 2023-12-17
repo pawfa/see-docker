@@ -22,8 +22,17 @@ const ubuntuImage = new DockerImage({
     position: {x: 550, y: 120},
     imageSrc: "./img/ubuntu-logo.png",
     scale: 60,
-    name: "ubuntu"
+    name: "ubuntu",
+    animations: {
+        pull : {movement:[['x', -150], ['y', 250]]},
+        run: {
+            timeout: 1000,
+            movement: [['x', -200, 2000]]
+        }
+    }
 });
+
+imagesArr.push(ubuntuImage)
 
 const images = new Container({
     position: {
@@ -66,19 +75,27 @@ let isWaitingForResponse = false;
 
 
 async function taskInputHandle() {
-    if (lastCommand.startsWith('docker rm ')) {
-        const id = newLine.split(" ")[2];
-        const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === id);
+    if (input.command === 'rm') {
+        const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === input.name);
         term.write("\r\n");
-        term.write(id);
+        term.write(input.name);
         foundContainer.setStatus('removed');
         setConsoleToNewLine();
     }
+    if (input.command === 'images') {
+        term.write("\r\n");
+        term.write(dockerImages());
+        setConsoleToNewLine();
+    }
+    if (input.command === 'ps') {
+        term.write("\r\n");
+        term.write(dockerContainers());
+        setConsoleToNewLine();
+    }
 
-
-    if (lastCommand === 'docker container prune') {
+    if (input.command === 'container' && input.name === 'prune') {
         if (isWaitingForResponse) {
-            for (const dockerImage of containersArr) {
+            for (const dockerImage of containersArr.filter((container)=> container.status === 'exited')) {
                 term.write("\r\n");
                 term.write(dockerImage.id);
                 dockerImage.setStatus('removed');
@@ -86,24 +103,30 @@ async function taskInputHandle() {
             isWaitingForResponse = false
             setConsoleToNewLine();
         } else {
+            isWaitingForResponse = true
             term.write("\r\n");
             term.write("WARNING! This will remove all stopped containers.\r\n" +
                 "Are you sure you want to continue? [y/N]");
-            isWaitingForResponse = true
         }
     }
-    if (lastCommand === 'docker ps -a') {
-        term.write("\r\n");
-        term.write(dockerContainers(["-a"]));
-        setConsoleToNewLine();
-    }
 
-    if (lastCommand === 'docker pull ubuntu') {
-        term.write("\r\n");
-        await ubuntuImage.pull()
+    if (input.command === 'run') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            await img.runImage()
+        } else {
+            setConsoleToNewLine()
+        }
     }
-    if (newLine === 'docker run ubuntu') {
-        await ubuntuImage.runImage()
+    if (input.command === 'pull') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            img.pull()
+        } else {
+            setConsoleToNewLine()
+        }
     }
 }
 

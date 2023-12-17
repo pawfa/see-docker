@@ -87,12 +87,12 @@ term.onKey(function (event) {
 });
 
 function taskInputHandle() {
-    if (input.command === 'docker images') {
+    if (input.command === 'images') {
         term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();
     }
-    if (input.command === 'docker ps') {
+    if (input.command === 'ps') {
         term.write("\r\n");
         term.write(dockerContainers());
         setConsoleToNewLine();

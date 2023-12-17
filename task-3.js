@@ -96,6 +96,7 @@ function draw() {
 
     helloWorldImage.draw();
 }
+imagesArr.push(helloWorldImage)
 
 draw();
 
@@ -104,8 +105,13 @@ term.onKey(function (event) {
 });
 
 async function taskInputHandle() {
-    if (newLine === 'docker run hello-world') {
-        term.write("\r\n");
-        await helloWorldImage.runImage()
+    if (input.command === 'run') {
+        const img = imagesArr.find((image)=> image.name === input.name)
+        if (img) {
+            term.write("\r\n");
+            await img.runImage()
+        } else {
+            setConsoleToNewLine()
+        }
     }
 }

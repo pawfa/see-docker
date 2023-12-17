@@ -102,7 +102,6 @@ class DockerImage {
                             this.setStatus('downloaded');
                             setConsoleToNewLine();
                             resolve();
-                            imagesArr.push(this);
                         }, Number(timeout));
                     }
                 }
@@ -127,7 +126,6 @@ class DockerImage {
                             term.write(log);
                             this.setStatus('downloaded');
                             resolve();
-                            imagesArr.push(this);
                         }, Number(timeout));
                     }
                 }
@@ -154,7 +152,6 @@ class DockerImage {
                 }, Number(timeout));
             }
         }
-        containersArr.push(this);
     }
 
     runAnimation(animation) {
