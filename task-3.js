@@ -87,12 +87,6 @@ const containers = new Container({
 imagesArr.push(helloWorldImage)
 drawables.push(host,registry,images,containers,helloWorldImage)
 
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event,taskInputHandle)
-});
-
 async function taskInputHandle() {
     if (input.command === 'run') {
         const img = imagesArr.find((image)=> image.name === input.name)

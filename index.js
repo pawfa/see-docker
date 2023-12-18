@@ -14,19 +14,6 @@ let term = new Terminal({
 term.open(document.getElementById('terminal'));
 term.write('user@host:/$ ');
 
-term.attachCustomKeyEventHandler((arg) => {
-    if (arg.ctrlKey && arg.code === "KeyV" && arg.type === "keydown") {
-        navigator.clipboard.readText()
-            .then(text => {
-                term.write(text);
-            })
-    }
-    if (arg.ctrlKey && arg.code === "KeyC" && arg.type === "keydown") {
-        setConsoleToNewLine()
-    }
-    return true;
-});
-
 const img = new Image();
 img.src = "./img/logo-docker.JPG";
 
@@ -132,12 +119,28 @@ function handleXtermInput(event,onEnter) {
             term.write("\b \b");
         }
     } else if (event.key === "\r") {
-        if (newLine === '') {
+        parseDockerCommand()
+        if (!input.command) {
             setConsoleToNewLine()
         } else {
-            parseDockerCommand()
             onEnter(event)
         }
+    } else if(event.key === '\x16') {
+        navigator.clipboard.readText()
+            .then(text => {
+                newLine += text;
+                term.write(text);
+            });
+    } else if(event.key === '\x03') {
+        if (term.hasSelection()) {
+            navigator.clipboard.writeText(term.getSelection())
+            newLine += event.key;
+            term.write(event.key);
+        } else {
+            setConsoleToNewLine()
+            input = {}
+        }
+
     } else {
         newLine += event.key;
         term.write(event.key);
@@ -152,6 +155,7 @@ function setConsoleToNewLine() {
     term.write("\r\n");
     term.write(DIR);
     newLine = '';
+    input = {}
 }
 
 var x = document.createElement("BUTTON");

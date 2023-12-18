@@ -28,6 +28,7 @@ body {
     margin-top: 10px;
     margin-right: 16px;
     float: right;
+    cursor: pointer;
 }
 .header {
     display: flex;
@@ -35,6 +36,13 @@ body {
 }
 .description {
     padding-right:16px;
+}
+
+.command {
+    color: white;
+    background-color: #00084D;
+    padding:2px 10px;
+    border-radius: 10px;
 }
 
 canvas {
