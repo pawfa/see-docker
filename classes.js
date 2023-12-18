@@ -12,12 +12,12 @@ class Container {
     }
 
     draw() {
-        ctx.globalAlpha = 0.6
+        ctx.globalAlpha = 0.6;
         ctx.fillStyle = this.style.backgroundColor;
         ctx.beginPath();
         ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);
         ctx.fill();
-        ctx.globalAlpha = 1
+        ctx.globalAlpha = 1;
         ctx.strokeStyle = this.style.strokeColor;
         ctx.beginPath();
         ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);
@@ -37,14 +37,13 @@ class DockerImage {
     constructor({position, imageSrc, animations, scale, name, logs}) {
         this.position = {...position};
         this.name = name;
-        this.isAnimated = false;
         this.image = new Image();
         this.image.src = imageSrc;
         this.animations = animations;
-        this.animation = [];
+        this.currentAnimations = [];
         this.animationPosition = {
             ...position,
-            i: 0
+            i: 0,
         };
         this.status = 'registry';
         this.scale = scale;
@@ -60,7 +59,7 @@ class DockerImage {
             ],
             ...logs
         };
-        canvas.addEventListener('mousemove', (e)=> {
+        canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect(),
                 x = e.clientX - rect.left,
                 y = e.clientY - rect.top;
@@ -70,7 +69,7 @@ class DockerImage {
             } else if (this.isHovered) {
                 this.isHovered = false;
             }
-        })
+        });
     }
 
     getPullLogs() {
@@ -91,7 +90,7 @@ class DockerImage {
     async pull() {
         return new Promise((resolve) => {
             if (this.status === 'registry') {
-                const pullLogs = this.getPullLogs()
+                const pullLogs = this.getPullLogs();
                 for (let i = 0; i < pullLogs.length; i++) {
                     const [timeout, log] = pullLogs[i];
                     if (i === 0) {
@@ -113,10 +112,21 @@ class DockerImage {
         });
     }
 
+    getContainer() {
+        return new DockerImage({
+            position: this.position,
+            imageSrc: this.image.src,
+            animations: this.animations,
+            scale: this.scale,
+            name: this.name,
+            logs: this.logs
+        })
+    }
+
     async runImage() {
         if (this.status === 'registry') {
             await new Promise((resolve) => {
-                const pullLogs = this.getPullLogs()
+                const pullLogs = this.getPullLogs();
                 for (let i = 0; i < pullLogs.length; i++) {
                     const [timeout, log] = pullLogs[i];
                     if (i === 0) {
@@ -133,6 +143,19 @@ class DockerImage {
                 }
             });
         }
+        let intervalID;
+        intervalID = setInterval(()=> {
+            if (this.currentAnimations.length === 0) {
+                const container = this.getContainer()
+                container.runContainer()
+                clearInterval(intervalID)
+            }
+        },100)
+    }
+
+    runContainer() {
+        containersArr.push(this);
+        drawables.push(this);
 
         for (let i = 0; i < this.logs['run'].length; i++) {
             const [timeout, log] = this.logs['run'][i];
@@ -141,12 +164,11 @@ class DockerImage {
             }
             if (i === this.logs['run'].length - 1) {
                 setTimeout(async () => {
-                    containersArr.push(this);
                     await this.setStatus('running', 500);
                     term.write(log);
                     if (input.args.length > 0) {
                         if (input.args[0].includes("echo")) {
-                            term.write(input.args[0].split('echo')[1].trim().replaceAll("\"",''));
+                            term.write(input.args[0].split('echo')[1].trim().replaceAll("\"", ''));
                         }
                     }
                     this.setStatus('exited');
@@ -160,21 +182,22 @@ class DockerImage {
         if (typeof animation === 'string') {
             const selectedAnimation = this.animations[animation];
             if (selectedAnimation.timeout) {
-                setTimeout(()=> {
-                    this.animation.push(...this.animations[animation].movement)
-                    this.isAnimated = true;
-                },selectedAnimation.timeout)
-            }else {
-                this.animation.push(...this.animations[animation].movement);
+                setTimeout(() => {
+                    this.currentAnimations.push({
+                        name: animation,
+                        steps: this.animations[animation].movement
+                    });
+                }, selectedAnimation.timeout);
+            } else {
+                this.currentAnimations.push({
+                    name: animation,
+                    steps: this.animations[animation].movement
+                });
             }
-        } else {
-            this.animation = animation;
         }
-        this.isAnimated = true;
     }
 
     async setStatus(status, timeout) {
-        this.status = status;
         if (timeout !== undefined) {
             await new Promise((resolve) => {
                 this.status = status;
@@ -182,24 +205,36 @@ class DockerImage {
                     resolve();
                 }, timeout);
             });
+        } else {
+            this.status = status;
         }
     }
 
 
     animate() {
-        if (this.animationPosition.i >= this.animation.length) {
-            this.isAnimated = false;
+        let current = this.currentAnimations[0];
+
+        if (!current) {
             return;
         }
 
-        const currentMovement = this.animation[this.animationPosition.i];
+        if (this.animationPosition.i === current.steps.length) {
+            if (this.currentAnimations.length === 0) {
+                return;
+            } else {
+                this.currentAnimations.shift();
+                current = this.currentAnimations.shift()
+                this.animationPosition.i = 0
+            }
+        }
+
+        const currentMovement = current.steps[this.animationPosition.i];
 
         if ((currentMovement[1] > 0 && this.position[currentMovement[0]] > this.animationPosition[currentMovement[0]] + currentMovement[1]) || currentMovement[1] < 0 && this.position[currentMovement[0]] < this.animationPosition[currentMovement[0]] + currentMovement[1]) {
             this.animationPosition = {x: this.position.x, y: this.position.y, i: this.animationPosition.i + 1};
         }
         this.position[currentMovement[0]] = currentMovement[1] > 0 ? this.position[currentMovement[0]] + 4 : this.position[currentMovement[0]] - 4;
     }
-    count = 0;
 
     draw() {
         ctx.strokeStyle = '#00084D';
@@ -209,24 +244,17 @@ class DockerImage {
         if (this.status === 'running') {
             ctx.strokeStyle = 'green';
             ctx.save();
-            if (this.count ===3) {
-                this.count = 0
-            }
-
             ctx.font = "10px Roboto";
             ctx.fillStyle = 'green';
-            for (let i = 0; i < this.count; i++) {
-                ctx.fillText(".", this.position.x +50+this.count, this.position.y - 10);
-            }
             ctx.fillText("RUNNING", this.position.x - 5, this.position.y - 10);
             ctx.restore();
         }
         if (this.isHovered) {
-            ctx.save()
+            ctx.save();
             ctx.font = "10px Roboto";
-            ctx.fillStyle = 'black'
+            ctx.fillStyle = 'black';
             ctx.fillText(this.id, this.position.x - 5, this.position.y + 100);
-            ctx.restore()
+            ctx.restore();
         }
         if (this.status === 'exited') {
             ctx.strokeStyle = 'red';
@@ -237,22 +265,24 @@ class DockerImage {
             ctx.restore();
         }
         if (this.image.src) {
-            const ratio = this.image.naturalWidth / this.image.naturalHeight;
-            const imageWidth = this.image.height / this.scale * ratio;
-            const imageHeight = this.image.height / this.scale;
-            ctx.fillStyle = 'white';
-            ctx.fillRect(this.position.x - 5, this.position.y - 5, imageWidth + 10, imageHeight + 10);
-            ctx.drawImage(this.image, this.position.x, this.position.y, this.image.height / this.scale * ratio, this.image.height / this.scale);
-
-            ctx.strokeRect(this.position.x - 5, this.position.y - 5, imageWidth + 10, imageHeight + 10);
-            ctx.strokeStyle = 'black';
+            this.drawDockerRectangle(this.position);
         } else {
             ctx.strokeRect(this.position.x, this.position.y, 50, 50);
         }
 
-        if (this.isAnimated) {
-            this.animate();
-        }
+        this.animate();
 
+    }
+
+    drawDockerRectangle(position) {
+        const ratio = this.image.naturalWidth / this.image.naturalHeight;
+        const imageWidth = this.image.height / this.scale * ratio;
+        const imageHeight = this.image.height / this.scale;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(position.x - 5, position.y - 5, imageWidth + 10, imageHeight + 10);
+        ctx.drawImage(this.image, position.x, position.y, this.image.height / this.scale * ratio, this.image.height / this.scale);
+
+        ctx.strokeRect(position.x - 5, position.y - 5, imageWidth + 10, imageHeight + 10);
+        ctx.strokeStyle = 'black';
     }
 }
