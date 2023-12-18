@@ -64,24 +64,7 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    registry.draw()
-    images.draw();
-    containers.draw();
-
-    ubuntuImage.draw();
-}
-
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event,taskInputHandle)
-});
+drawables.push(host,registry,images,containers,ubuntuImage)
 
 async function taskInputHandle() {
     if (input.command === 'run') {

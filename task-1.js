@@ -1,10 +1,10 @@
 const helloWorldImage = new DockerImage({
-    position: {x: 600, y: 120},
+    position: {x: 550, y: 130},
     imageSrc: "./img/hello-world-logo.png",
     scale: 3,
     name: "hello-world",
     animations: {
-        pull : {movement:[['x', -200], ['y', 250], ['x', -225]]}
+        pull : {movement:[['x', -200], ['y', 260], ['x', -150]]}
     }
 });
 const host = new Container({
@@ -19,8 +19,8 @@ const host = new Container({
 
 const images = new Container({
     position: {
-        x: 150,
-        y: 350,
+        x: 170,
+        y: 370,
     },
     width: 100,
     height: 100,
@@ -35,28 +35,12 @@ const registry = new Container({
         x: 500,
         y: 100,
     },
-    width: 200,
-    height: 100,
+    width: 270,
+    height: 140,
     label: "Registry (https://hub.docker.com)"
 });
 imagesArr.push(helloWorldImage)
-
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    images.draw();
-    registry.draw();
-
-    helloWorldImage.draw();
-}
-
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event, taskInputHandle);
-});
+drawables.push(host,images,registry,helloWorldImage)
 
 function taskInputHandle() {
     if (input.command === 'pull') {

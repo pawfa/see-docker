@@ -72,22 +72,7 @@ const containers = new Container({
     }
 });
 
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    images.draw();
-    containers.draw();
-
-    helloWorldImage.draw();
-}
-
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event, taskInputHandle);
-});
+drawables.push(host,images,containers,helloWorldImage)
 
 async function taskInputHandle() {
     if (input.command === 'run') {

@@ -84,19 +84,8 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    registry.draw()
-    images.draw();
-    containers.draw();
-
-    helloWorldImage.draw();
-}
 imagesArr.push(helloWorldImage)
+drawables.push(host,registry,images,containers,helloWorldImage)
 
 draw();
 

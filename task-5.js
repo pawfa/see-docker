@@ -14,6 +14,7 @@ const ubuntuImage = new DockerImage({
     scale: 60,
     name: 'ubuntu'
 });
+ubuntuImage.setStatus('downloaded')
 const ubuntuContainerRunning = new DockerImage({
     position: {x: 220, y: 380},
     imageSrc: "./img/ubuntu-logo.png",
@@ -29,6 +30,7 @@ const helloWorldImage = new DockerImage({
     scale: 3,
     name: 'hello-world'
 });
+helloWorldImage.setStatus('downloaded')
 const helloWorldContainerExited = new DockerImage({
     position: {x: 130, y: 380},
     imageSrc: "./img/hello-world-logo.png",
@@ -66,28 +68,11 @@ const containers = new Container({
 
 imagesArr.push(helloWorldImage, ubuntuImage)
 containersArr.push(helloWorldContainerExited, ubuntuContainerRunning)
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    images.draw();
-    containers.draw();
-
-    ubuntuImage.draw();
-    helloWorldImage.draw();
-    helloWorldContainerExited.draw()
-    ubuntuContainerRunning.draw();
-}
-
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event,taskInputHandle)
-});
+drawables.push(host,images,containers,ubuntuImage,helloWorldImage, helloWorldContainerExited,ubuntuContainerRunning)
 
 function taskInputHandle() {
     if (input.command === 'images') {
+        console.log(imagesArr)
         term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();

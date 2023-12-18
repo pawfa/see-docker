@@ -20,12 +20,15 @@ term.attachCustomKeyEventHandler((arg) => {
             .then(text => {
                 term.write(text);
             })
-    };
+    }
     if (arg.ctrlKey && arg.code === "KeyC" && arg.type === "keydown") {
         setConsoleToNewLine()
     }
     return true;
 });
+
+const img = new Image();
+img.src = "./img/logo-docker.JPG";
 
 const DIR = "user@host:/$ ";
 let newLine = '';
@@ -35,6 +38,7 @@ const imagesArr = [];
 const containersArr = [];
 
 const dockerCommands = ["pull", "run", "rm", "ps", "images", "container"]
+const drawables = []
 
 let input = {
     command: '',
@@ -42,6 +46,20 @@ let input = {
     args: [],
     name: ''
 }
+function draw() {
+    window.requestAnimationFrame(draw);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 0.1
+    ctx.drawImage(img, 0, 0, img.width, img.height,0,10,img.width*0.8,img.height*0.8);
+
+    drawables.forEach((drawable => drawable.draw()));
+}
+term.onKey(function (event) {
+    handleXtermInput(event, taskInputHandle);
+});
+
+draw();
 function parseDockerCommand() {
     if(isWaitingForResponse) {
         return
@@ -139,7 +157,9 @@ function setConsoleToNewLine() {
 var x = document.createElement("BUTTON");
 var t = document.createTextNode("Next");
 x.appendChild(t);
-document.body.appendChild(x);
+document.querySelector(".left-side").appendChild(x);
+
+x.classList.add("next-btn")
 
 x.onclick = ()=>{
     const pathName = window.location.pathname;

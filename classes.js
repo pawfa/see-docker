@@ -12,10 +12,12 @@ class Container {
     }
 
     draw() {
+        ctx.globalAlpha = 0.6
         ctx.fillStyle = this.style.backgroundColor;
         ctx.beginPath();
         ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);
         ctx.fill();
+        ctx.globalAlpha = 1
         ctx.strokeStyle = this.style.strokeColor;
         ctx.beginPath();
         ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);

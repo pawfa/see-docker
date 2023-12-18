@@ -3,17 +3,42 @@
     justify-content: flex-start;
     gap: 20px;
 }
-.left-side {
-    width: 40%
-}
-.right-side {
 
+.left-side {
+    width: 40%;
+    padding: 10px;
 }
+
+.right-side {
+    padding: 10px;
+}
+
 body {
     background-color: #E5F2FC;
     font-family: 'Roboto', sans-serif;
+    color: #00084D
 }
+
+.next-btn {
+    background-color: #00084D;
+    color: white;
+    border-radius: 4px;
+    width: 60px;
+    height: 25px;
+    margin-top: 10px;
+    margin-right: 16px;
+    float: right;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+.description {
+    padding-right:16px;
+}
+
 canvas {
-    border: 1px solid #00084D;"
+    border: 1px solid #00084D;
+    border-radius: 20px;
 }
 

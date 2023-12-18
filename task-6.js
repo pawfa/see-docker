@@ -66,26 +66,7 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-
-function draw() {
-    window.requestAnimationFrame(draw);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    host.draw();
-    images.draw();
-    containers.draw();
-
-    ubuntuImage.draw();
-    helloWorldImage.draw();
-    helloWorldContainerExited.draw();
-    ubuntuContainerRunning.draw();
-}
-
-draw();
-
-term.onKey(function (event) {
-    handleXtermInput(event, taskInputHandle);
-});
-let lastCommand = ''
+drawables.push(host,images,containers,ubuntuImage,helloWorldImage,helloWorldContainerExited,ubuntuContainerRunning);
 
 function taskInputHandle(event) {
     if (input.command === 'rm') {
