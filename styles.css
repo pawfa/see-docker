@@ -30,9 +30,11 @@ body {
     float: right;
     cursor: pointer;
 }
+
 .header {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
 }
 .description {
     padding-right:16px;

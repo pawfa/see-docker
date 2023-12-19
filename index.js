@@ -17,22 +17,6 @@ term.write('user@host:/$ ');
 const img = new Image();
 img.src = "./img/logo-docker.JPG";
 
-const DIR = "user@host:/$ ";
-let newLine = '';
-let isWaitingForResponse = false;
-
-const imagesArr = [];
-const containersArr = [];
-
-const dockerCommands = ["pull", "run", "rm", "ps", "images", "container"]
-const drawables = []
-
-let input = {
-    command: '',
-    options: [],
-    args: [],
-    name: ''
-}
 function draw() {
     window.requestAnimationFrame(draw);
 
@@ -158,8 +142,8 @@ function setConsoleToNewLine() {
     input = {}
 }
 
-var x = document.createElement("BUTTON");
-var t = document.createTextNode("Next");
+const x = document.createElement("BUTTON");
+const t = document.createTextNode("Next");
 x.appendChild(t);
 document.querySelector(".left-side").appendChild(x);
 
