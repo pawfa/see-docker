@@ -70,11 +70,13 @@ class DockerImage {
                 this.isHovered = false;
             }
         });
+        // TODO extract drawable logic to separate class to avoid pushing object to imagesarr twice when created new DockerContainer
+        imagesArr.push(this)
     }
 
     getPullLogs() {
         const pullLogs = [];
-        if (input.command === 'docker run') {
+        if (input.command === 'run') {
             pullLogs.push([0, `Unable to find image '${this.name}:latest' locally\n\r`]);
             pullLogs.push([1000, `latest: Pulling from library/${this.name}\r\n719385e32844: Waiting`]);
             pullLogs.push([2000, `\x1b[A\x1b[2K\rlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]);
@@ -198,6 +200,10 @@ class DockerImage {
             }
         }
 
+        if (!current) {
+            return;
+        }
+
         const currentMovement = current.steps[this.animationPosition.i];
 
         if ((currentMovement[1] > 0 && this.position[currentMovement[0]] > this.animationPosition[currentMovement[0]] + currentMovement[1]) || currentMovement[1] < 0 && this.position[currentMovement[0]] < this.animationPosition[currentMovement[0]] + currentMovement[1]) {
@@ -251,7 +257,7 @@ class DockerContainer extends DockerImage {
             scale: scale,
             name: name,
             logs: logs
-        })
+        }).run();
     }
 
     constructor({position, imageSrc, animations, scale, name, logs}) {
@@ -263,12 +269,11 @@ class DockerContainer extends DockerImage {
             name: name,
             logs: logs
         });
-        this.runContainer()
-    }
-    runContainer() {
-        containersArr.push(this);
+        console.log('here')
         drawables.push(this);
-
+        containersArr.push(this);
+    }
+    run() {
         for (let i = 0; i < this.logs['run'].length; i++) {
             const [timeout, log] = this.logs['run'][i];
             if (i === 0) {
@@ -289,7 +294,7 @@ class DockerContainer extends DockerImage {
             }
         }
     }
-
+    count = 0;
     draw() {
         ctx.strokeStyle = '#00084D';
         if (this.status === 'removed') {
@@ -314,24 +319,24 @@ class DockerContainer extends DockerImage {
             const imageWidth = this.image.height / this.scale * ratio;
             const imageHeight = this.image.height / this.scale;
 
-
-            const size = imageWidth + 10;
-            const depth = 20;
-            const x = this.position.x-5;
-            const y = this.position.y -5;
+            const height = imageHeight + 10;
+            const width = imageWidth + 10;
+            const depth = 5;
+            const x = this.position.x - 5;
+            const y = this.position.y - 5;
 
             ctx.fillStyle = 'white';
             ctx.lineWidth = 0.5
             ctx.fillRect(x, y, imageWidth + 10, imageHeight + 10);
             ctx.drawImage(this.image, this.position.x, this.position.y, this.image.height / this.scale * ratio, this.image.height / this.scale);
-            ctx.strokeRect(x, y, size, size);
+            ctx.strokeRect(x, y, width, height);
             ctx.lineWidth = 1
 
             ctx.fillStyle = "white";
             ctx.beginPath();
             ctx.moveTo(x, y);
-            ctx.lineTo(x + size, y);
-            ctx.lineTo(x + size + depth, y - depth);
+            ctx.lineTo(x + width, y);
+            ctx.lineTo(x + width + depth, y - depth);
             ctx.lineTo(x + depth, y - depth);
             ctx.closePath();
             ctx.stroke()
@@ -339,35 +344,61 @@ class DockerContainer extends DockerImage {
 
             ctx.fillStyle = "white";
             ctx.beginPath();
-            ctx.moveTo(x + size, y);
-            ctx.lineTo(x + size, y + size);
-            ctx.lineTo(x + size + depth, y + size - depth);
-            ctx.lineTo(x + size + depth, y - depth);
+            ctx.moveTo(x + width, y);
+            ctx.lineTo(x + width, y + height);
+            ctx.lineTo(x + width + depth, y + height - depth);
+            ctx.lineTo(x + width + depth, y - depth);
             ctx.closePath();
             ctx.stroke()
             ctx.fill();
-        } else {
-            ctx.strokeRect(this.position.x, this.position.y, 50, 50);
-        }
-        if (this.status === 'exited') {
-            ctx.strokeStyle = 'red';
-            ctx.save();
-            ctx.font = "10px Roboto";
-            ctx.fillStyle = 'red';
-            ctx.fillText("EXITED", this.position.x - 5, this.position.y - 10);
-            ctx.restore();
-        }
-        if (this.status === 'running') {
-            ctx.strokeStyle = 'green';
-            ctx.save();
-            ctx.font = "10px Roboto";
-            ctx.fillStyle = 'green';
-            ctx.fillText("RUNNING", this.position.x - 5, this.position.y - 10);
-            ctx.restore();
-        }
 
+            if (this.status === 'exited') {
+                ctx.strokeStyle = 'red';
+                ctx.save();
+                ctx.font = "10px Roboto";
+                ctx.fillStyle = 'red';
+                ctx.fillText("EXITED", this.position.x - 5, y + height +10);
+                ctx.restore();
+            }
+            if (this.status === 'running') {
+
+                ctx.strokeStyle = 'green';
+                ctx.save();
+                ctx.font = "10px Roboto";
+                ctx.fillStyle = 'green';
+                ctx.fillText("RUNNING", this.position.x - 5, y + height +10);
+                ctx.restore();
+
+                this.count++;
+
+                if (this.count % 100 > 40) {
+                    ctx.strokeStyle = 'green';
+                    ctx.save();
+                    ctx.font = "20px Roboto";
+                    ctx.fillStyle = 'green';
+                    ctx.fillText(".", this.position.x + 50, y + height +10);
+                    ctx.restore();
+                }
+                if (this.count % 100 > 20) {
+                    ctx.strokeStyle = 'green';
+                    ctx.save();
+                    ctx.font = "20px Roboto";
+                    ctx.fillStyle = 'green';
+                    ctx.fillText(".", this.position.x + 45, y + height +10);
+                    ctx.restore();
+                }
+                if (this.count % 100 > 2) {
+                    ctx.strokeStyle = 'green';
+                    ctx.save();
+                    ctx.font = "20px Roboto";
+                    ctx.fillStyle = 'green';
+                    ctx.fillText(".", this.position.x + 40, y + height +10);
+                    ctx.restore();
+                }
+            }
+        }
         this.animate();
-
+        ctx.strokeStyle = '#00084D';
     }
 
 }

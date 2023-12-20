@@ -37,7 +37,6 @@ const ubuntuImage = new DockerImage({
         run: [[2000,'']]
     }
 });
-imagesArr.push(ubuntuImage)
 
 const images = new Container({
     position: {

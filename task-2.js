@@ -44,7 +44,6 @@ const helloWorldImage = new DockerImage({
     }
 });
 helloWorldImage.setStatus('downloaded')
-imagesArr.push(helloWorldImage)
 
 const images = new Container({
     position: {
@@ -72,7 +71,7 @@ const containers = new Container({
     }
 });
 
-drawables.push(host,images,containers,helloWorldImage)
+drawables.push(host,images,containers,...imagesArr)
 
 async function taskInputHandle() {
     if (input.command === 'run') {

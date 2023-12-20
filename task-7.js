@@ -32,8 +32,6 @@ const ubuntuImage = new DockerImage({
     }
 });
 
-imagesArr.push(ubuntuImage)
-
 const images = new Container({
     position: {
         x: 340,
@@ -54,7 +52,7 @@ const containers = new Container({
     label: "Containers"
 });
 
-drawables.push(host,images,containers,registry,ubuntuImage)
+drawables.push(host,images,containers,registry, ...imagesArr,...containersArr)
 
 async function taskInputHandle() {
     if (input.command === 'rm') {

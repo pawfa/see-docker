@@ -39,8 +39,8 @@ const registry = new Container({
     height: 140,
     label: "Registry (https://hub.docker.com)"
 });
-imagesArr.push(helloWorldImage)
-drawables.push(host,images,registry,helloWorldImage)
+
+drawables.push(host,images,registry,...imagesArr)
 
 function taskInputHandle() {
     if (input.command === 'pull') {

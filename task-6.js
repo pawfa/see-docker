@@ -14,14 +14,14 @@ const ubuntuImage = new DockerImage({
     scale: 60,
     name: "ubuntu"
 });
-imagesArr.push(ubuntuImage)
-const ubuntuContainerRunning = new DockerImage({
+
+const ubuntuContainerRunning = new DockerContainer({
     position: {x: 220, y: 380},
     imageSrc: "./img/ubuntu-logo.png",
     scale: 60,
     name: "ubuntu"
 });
-containersArr.push(ubuntuContainerRunning)
+
 ubuntuContainerRunning.setStatus('running');
 
 const helloWorldImage = new DockerImage({
@@ -30,14 +30,14 @@ const helloWorldImage = new DockerImage({
     scale: 3,
     name: "hello-world"
 });
-imagesArr.push(helloWorldImage)
-const helloWorldContainerExited = new DockerImage({
+
+const helloWorldContainerExited = new DockerContainer({
     position: {x: 130, y: 380},
     imageSrc: "./img/hello-world-logo.png",
     scale: 3,
     name: "hello-world"
 });
-containersArr.push(helloWorldContainerExited)
+
 helloWorldContainerExited.setStatus('exited');
 
 
@@ -66,9 +66,10 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-drawables.push(host,images,containers,ubuntuImage,helloWorldImage,helloWorldContainerExited,ubuntuContainerRunning);
 
-function taskInputHandle(event) {
+drawables.push(host,images,containers,...imagesArr, ...containersArr);
+
+function taskInputHandle() {
     if (input.command === 'rm') {
         const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === input.name);
         term.write("\r\n");

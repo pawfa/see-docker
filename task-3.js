@@ -32,7 +32,7 @@ const helloWorldImage = new DockerImage({
         }
     },
     logs: {
-        run: [[2000, "\r\n" +
+        run: [[3000, "\r\n" +
         "Hello from Docker!\r\n" +
         "This message shows that your installation appears to be working correctly.\r\n" +
         "\r\n" +
@@ -84,8 +84,7 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-imagesArr.push(helloWorldImage)
-drawables.push(host,registry,images,containers,helloWorldImage)
+drawables.push(host,registry,images,...imagesArr,...containersArr)
 
 async function taskInputHandle() {
     if (input.command === 'run') {

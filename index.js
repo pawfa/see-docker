@@ -110,16 +110,16 @@ function handleXtermInput(event,onEnter) {
             onEnter(event)
         }
     } else if(event.key === '\x16') {
+        // Handle Ctrl + V
         navigator.clipboard.readText()
             .then(text => {
                 newLine += text;
                 term.write(text);
             });
     } else if(event.key === '\x03') {
+        // Handle Ctrl + C
         if (term.hasSelection()) {
             navigator.clipboard.writeText(term.getSelection())
-            newLine += event.key;
-            term.write(event.key);
         } else {
             setConsoleToNewLine()
             input = {}
