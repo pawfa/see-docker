@@ -19,6 +19,32 @@ const host = new Container({
     label: "Host"
 });
 
+const images = new Container({
+    position: {
+        x: 340,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
+const containers = new Container({
+    position: {
+        x: 110,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
 const helloWorldImage = new DockerImage({
     position: {x: 550, y: 130},
     imageSrc: "./img/hello-world-logo.png",
@@ -59,38 +85,10 @@ const helloWorldImage = new DockerImage({
     }
 });
 
-const images = new Container({
-    position: {
-        x: 340,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Images",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-
-const containers = new Container({
-    position: {
-        x: 110,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Containers",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-drawables.push(host,registry,images,...imagesArr,...containersArr)
-
 async function taskInputHandle() {
     if (input.command === 'run') {
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
-            term.write("\r\n");
             await img.runImage()
         } else {
             setConsoleToNewLine()

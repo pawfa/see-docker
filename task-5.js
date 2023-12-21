@@ -8,6 +8,32 @@ const host = new Container({
     label: "Host"
 });
 
+const images = new Container({
+    position: {
+        x: 340,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
+const containers = new Container({
+    position: {
+        x: 110,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
 const ubuntuImage = new DockerImage({
     position: {x: 450, y: 360},
     imageSrc: "./img/ubuntu-logo.png",
@@ -40,44 +66,13 @@ const helloWorldContainerExited = new DockerContainer({
 });
 helloWorldContainerExited.setStatus('exited')
 
-const images = new Container({
-    position: {
-        x: 340,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Images",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-
-const containers = new Container({
-    position: {
-        x: 110,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Containers",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-
-
-drawables.push(host,images,containers,...imagesArr,...containersArr)
 
 function taskInputHandle() {
     if (input.command === 'images') {
-        console.log(imagesArr)
-        term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();
     }
     if (input.command === 'ps') {
-        term.write("\r\n");
         term.write(dockerContainers());
         setConsoleToNewLine();
     }

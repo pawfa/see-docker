@@ -9,6 +9,7 @@ class Container {
             strokeColor: '#1D63ED',
             ...style
         };
+        drawables.add(this)
     }
 
     draw() {
@@ -32,11 +33,10 @@ class Container {
     }
 }
 
-
-class DockerImage {
-    constructor({position, imageSrc, animations, scale, name, logs}) {
+class DockerDrawable {
+    constructor({position, imageSrc, animations, scale}) {
         this.position = {...position};
-        this.name = name;
+        this.isHovered = false;
         this.image = new Image();
         this.image.src = imageSrc;
         this.animations = animations;
@@ -45,20 +45,7 @@ class DockerImage {
             ...position,
             i: 0,
         };
-        this.status = 'registry';
         this.scale = scale;
-        this.id = crypto.randomUUID().replaceAll("-", '');
-        this.isHovered = false;
-        this.logs = {
-            pull: [
-                [0, `Using default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Waiting`],
-                [3000, `\x1b[A\x1b[2K\r\x1b[A\x1b[2K\rUsing default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]
-            ],
-            run: [
-                [1000, ``],
-            ],
-            ...logs
-        };
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect(),
                 x = e.clientX - rect.left,
@@ -66,123 +53,30 @@ class DockerImage {
 
             if (x > this.position.x && x < this.position.x + 50 && y > this.position.y && y < this.position.y + 50) {
                 this.isHovered = true;
+
             } else if (this.isHovered) {
                 this.isHovered = false;
             }
         });
-        // TODO extract drawable logic to separate class to avoid pushing object to imagesarr twice when created new DockerContainer
-        imagesArr.push(this)
-    }
-
-    getPullLogs() {
-        const pullLogs = [];
-        if (input.command === 'run') {
-            pullLogs.push([0, `Unable to find image '${this.name}:latest' locally\n\r`]);
-            pullLogs.push([1000, `latest: Pulling from library/${this.name}\r\n719385e32844: Waiting`]);
-            pullLogs.push([2000, `\x1b[A\x1b[2K\rlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]);
-        } else {
-            pullLogs.push([0, `Using default tag: latest\n\r`]);
-            pullLogs.push([1000, `latest: Pulling from library/${this.name}\r\n719385e32844: Waiting`]);
-            pullLogs.push([2000, `\x1b[A\x1b[2K\r\x1b[A\rlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]);
-        }
-
-        return pullLogs;
-    }
-
-    async pull() {
-        return new Promise((resolve) => {
-            if (this.status === 'registry') {
-                const pullLogs = this.getPullLogs();
-                for (let i = 0; i < pullLogs.length; i++) {
-                    const [timeout, log] = pullLogs[i];
-                    if (i === 0) {
-                        term.write(log);
-
-                        this.runAnimation('pull');
-                    } else {
-                        setTimeout(() => {
-                            term.write(log);
-                            this.setStatus('downloaded');
-                            setConsoleToNewLine();
-                            resolve();
-                        }, Number(timeout));
-                    }
-                }
-            } else {
-                resolve();
-            }
-        });
-    }
-
-    async runImage() {
-        if (this.status === 'registry') {
-            await new Promise((resolve) => {
-                const pullLogs = this.getPullLogs();
-                for (let i = 0; i < pullLogs.length; i++) {
-                    const [timeout, log] = pullLogs[i];
-                    if (i === 0) {
-                        term.write(log);
-
-                        this.runAnimation('pull');
-                    } else {
-                        setTimeout(() => {
-                            term.write(log);
-                            this.setStatus('downloaded');
-                            resolve();
-                        }, Number(timeout));
-                    }
-                }
-            });
-        }
-        let intervalID;
-        intervalID = setInterval(()=> {
-            if (this.currentAnimations.length === 0) {
-                DockerContainer.runContainer({
-                    position: this.position,
-                    imageSrc: this.image.src,
-                    animations: this.animations,
-                    scale: this.scale,
-                    name: this.name,
-                    logs: this.logs
-                })
-                clearInterval(intervalID)
-            }
-        },100)
+        drawables.add(this)
     }
 
     runAnimation(animation) {
-        if (typeof animation === 'string') {
-            const selectedAnimation = this.animations[animation];
-            if (selectedAnimation.timeout) {
-                setTimeout(() => {
-                    this.currentAnimations.push({
-                        name: animation,
-                        steps: this.animations[animation].movement
-                    });
-                }, selectedAnimation.timeout);
-            } else {
+        const selectedAnimation = this.animations[animation];
+        if (selectedAnimation.timeout) {
+            setTimeout(() => {
                 this.currentAnimations.push({
                     name: animation,
                     steps: this.animations[animation].movement
                 });
-            }
-        }
-    }
-
-    async setStatus(status, timeout) {
-        if (timeout !== undefined) {
-            await new Promise((resolve) => {
-                this.status = status;
-                setTimeout(() => {
-                    resolve();
-                }, timeout);
-            });
+            }, selectedAnimation.timeout);
         } else {
-            this.status = status;
+            this.currentAnimations.push({
+                name: animation,
+                steps: this.animations[animation].movement
+            });
         }
     }
-
-
     animate() {
         let current = this.currentAnimations[0];
 
@@ -247,7 +141,122 @@ class DockerImage {
     }
 }
 
-class DockerContainer extends DockerImage {
+
+class DockerImage extends DockerDrawable {
+    constructor({position, imageSrc, animations, scale, name, logs}) {
+        super({position, imageSrc, animations,scale});
+        this.name = name;
+        this.status = 'registry';
+        this.id = crypto.randomUUID().replaceAll("-", '');
+        this.logs = {
+            pull: [
+                [0, `Using default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Waiting`],
+                [3000, `\x1b[A\x1b[2K\r\x1b[A\x1b[2K\rUsing default tag: latest\r\nlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]
+            ],
+            run: [
+                [1000, ``],
+            ],
+            ...logs
+        };
+
+        // TODO extract drawable logic to separate class to avoid pushing object to imagesarr twice when created new DockerContainer
+        imagesArr.push(this)
+    }
+
+    getPullLogs() {
+        const pullLogs = [];
+        if (input.command === 'run') {
+            pullLogs.push([0, `Unable to find image '${this.name}:latest' locally\n\r`]);
+            pullLogs.push([1000, `latest: Pulling from library/${this.name}\r\n719385e32844: Waiting`]);
+            pullLogs.push([2000, `\x1b[A\x1b[2K\rlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]);
+        } else {
+            pullLogs.push([0, `Using default tag: latest\n\r`]);
+            pullLogs.push([1000, `latest: Pulling from library/${this.name}\r\n719385e32844: Waiting`]);
+            pullLogs.push([2000, `\x1b[2K\r\x1b[A\rlatest: Pulling from library/${this.name}\r\n719385e32844: Pull complete\r\nDigest: sha256:c79d06dfdfd3d3eb04cafd0dc2bacab0992ebc243e083cabe208bac4dd7759e0\r\nStatus: Downloaded newer image for ${this.name}:latest\r\n`]);
+        }
+
+        return pullLogs;
+    }
+
+    async pull() {
+        return new Promise((resolve) => {
+            if (this.status === 'registry') {
+                const pullLogs = this.getPullLogs();
+                for (let i = 0; i < pullLogs.length; i++) {
+                    const [timeout, log] = pullLogs[i];
+                    if (i === 0) {
+                        term.write(log);
+
+                        this.runAnimation('pull');
+                    } else {
+                        setTimeout(() => {
+                            term.write(log);
+                            if (i === pullLogs.length -1) {
+                                this.setStatus('downloaded');
+                                setConsoleToNewLine();
+                                resolve();
+                            }
+                        }, Number(timeout));
+                    }
+                }
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    async runImage() {
+        if (this.status === 'registry') {
+            await new Promise((resolve) => {
+                const pullLogs = this.getPullLogs();
+                for (let i = 0; i < pullLogs.length; i++) {
+                    const [timeout, log] = pullLogs[i];
+                    if (i === 0) {
+                        term.write(log);
+
+                        this.runAnimation('pull');
+                    } else {
+                        setTimeout(() => {
+                            term.write(log);
+                            this.setStatus('downloaded');
+                            resolve();
+                        }, Number(timeout));
+                    }
+                }
+            });
+        }
+        let intervalID;
+        intervalID = setInterval(()=> {
+            if (this.currentAnimations.length === 0) {
+                DockerContainer.runContainer({
+                    position: this.position,
+                    imageSrc: this.image.src,
+                    animations: this.animations,
+                    scale: this.scale,
+                    name: this.name,
+                    logs: this.logs
+                })
+                clearInterval(intervalID)
+            }
+        },100)
+    }
+
+    async setStatus(status, timeout) {
+        if (timeout !== undefined) {
+            await new Promise((resolve) => {
+                this.status = status;
+                setTimeout(() => {
+                    resolve();
+                }, timeout);
+            });
+        } else {
+            this.status = status;
+        }
+    }
+
+}
+
+class DockerContainer extends DockerDrawable {
 
     static runContainer({position, imageSrc, animations, scale, name, logs}) {
         new DockerContainer({
@@ -265,12 +274,13 @@ class DockerContainer extends DockerImage {
             position: position,
             imageSrc: imageSrc,
             animations: animations,
-            scale: scale,
-            name: name,
-            logs: logs
+            scale: scale
         });
-        console.log('here')
-        drawables.push(this);
+        this.id = crypto.randomUUID().replaceAll("-", '');
+        this.status = 'created'
+        this.name = name;
+        this.logs = logs;
+
         containersArr.push(this);
     }
     run() {
@@ -294,6 +304,19 @@ class DockerContainer extends DockerImage {
             }
         }
     }
+    async setStatus(status, timeout) {
+        if (timeout !== undefined) {
+            await new Promise((resolve) => {
+                this.status = status;
+                setTimeout(() => {
+                    resolve();
+                }, timeout);
+            });
+        } else {
+            this.status = status;
+        }
+    }
+
     count = 0;
     draw() {
         ctx.strokeStyle = '#00084D';

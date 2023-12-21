@@ -18,20 +18,6 @@ const host = new Container({
     label: "Host"
 });
 
-const ubuntuImage = new DockerImage({
-    position: {x: 550, y: 120},
-    imageSrc: "./img/ubuntu-logo.png",
-    scale: 60,
-    name: "ubuntu",
-    animations: {
-        pull : {movement:[['x', -150], ['y', 250]]},
-        run: {
-            timeout: 1000,
-            movement: [['x', -200, 2000]]
-        }
-    }
-});
-
 const images = new Container({
     position: {
         x: 340,
@@ -52,23 +38,33 @@ const containers = new Container({
     label: "Containers"
 });
 
-drawables.push(host,images,containers,registry, ...imagesArr,...containersArr)
+
+const ubuntuImage = new DockerImage({
+    position: {x: 550, y: 120},
+    imageSrc: "./img/ubuntu-logo.png",
+    scale: 60,
+    name: "ubuntu",
+    animations: {
+        pull : {movement:[['x', -150], ['y', 250]]},
+        run: {
+            timeout: 1000,
+            movement: [['x', -200, 2000]]
+        }
+    }
+});
 
 async function taskInputHandle() {
     if (input.command === 'rm') {
         const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === input.name);
-        term.write("\r\n");
         term.write(input.name);
         foundContainer.setStatus('removed');
         setConsoleToNewLine();
     }
     if (input.command === 'images') {
-        term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();
     }
     if (input.command === 'ps') {
-        term.write("\r\n");
         term.write(dockerContainers());
         setConsoleToNewLine();
     }
@@ -84,7 +80,6 @@ async function taskInputHandle() {
             setConsoleToNewLine();
         } else {
             isWaitingForResponse = true
-            term.write("\r\n");
             term.write("WARNING! This will remove all stopped containers.\r\n" +
                 "Are you sure you want to continue? [y/N]");
         }
@@ -93,7 +88,6 @@ async function taskInputHandle() {
     if (input.command === 'run') {
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
-            term.write("\r\n");
             await img.runImage()
         } else {
             setConsoleToNewLine()
@@ -102,7 +96,6 @@ async function taskInputHandle() {
     if (input.command === 'pull') {
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
-            term.write("\r\n");
             img.pull()
         } else {
             setConsoleToNewLine()

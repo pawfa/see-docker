@@ -19,25 +19,6 @@ const host = new Container({
     label: "Host"
 });
 
-const ubuntuImage = new DockerImage({
-    position: {x: 550, y: 130},
-    imageSrc: "./img/ubuntu-logo.png",
-    scale: 60,
-    name: 'ubuntu',
-    animations: {
-        pull: {
-            movement:[['x', -150], ['y', 250]]
-        },
-        run: {
-            movement: [['x', -200]],
-            timeout: 1000
-        }
-    },
-    logs: {
-        run: [[2000,'']]
-    }
-});
-
 const images = new Container({
     position: {
         x: 340,
@@ -63,7 +44,27 @@ const containers = new Container({
         backgroundColor: 'white'
     }
 });
-drawables.push(host,registry,images,containers,ubuntuImage)
+
+
+const ubuntuImage = new DockerImage({
+    position: {x: 550, y: 130},
+    imageSrc: "./img/ubuntu-logo.png",
+    scale: 60,
+    name: 'ubuntu',
+    animations: {
+        pull: {
+            movement:[['x', -150], ['y', 250]]
+        },
+        run: {
+            movement: [['x', -200]],
+            timeout: 1000
+        }
+    },
+    logs: {
+        run: [[2000,'']]
+    }
+});
+
 
 async function taskInputHandle() {
     if (input.command === 'run') {

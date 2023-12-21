@@ -8,6 +8,32 @@ const host = new Container({
     label: "Host"
 });
 
+const images = new Container({
+    position: {
+        x: 340,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Images",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
+const containers = new Container({
+    position: {
+        x: 110,
+        y: 340,
+    },
+    width: 200,
+    height: 200,
+    label: "Containers",
+    style: {
+        backgroundColor: 'white'
+    }
+});
+
 const ubuntuImage = new DockerImage({
     position: {x: 450, y: 360},
     imageSrc: "./img/ubuntu-logo.png",
@@ -40,50 +66,18 @@ const helloWorldContainerExited = new DockerContainer({
 
 helloWorldContainerExited.setStatus('exited');
 
-
-const images = new Container({
-    position: {
-        x: 340,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Images",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-
-const containers = new Container({
-    position: {
-        x: 110,
-        y: 340,
-    },
-    width: 200,
-    height: 200,
-    label: "Containers",
-    style: {
-        backgroundColor: 'white'
-    }
-});
-
-drawables.push(host,images,containers,...imagesArr, ...containersArr);
-
 function taskInputHandle() {
     if (input.command === 'rm') {
         const foundContainer = containersArr.find((container) => container.id.substring(0, 11) === input.name);
-        term.write("\r\n");
         term.write(input.name);
         foundContainer.setStatus('removed');
         setConsoleToNewLine();
     }
     if (input.command === 'images') {
-        term.write("\r\n");
         term.write(dockerImages());
         setConsoleToNewLine();
     }
     if (input.command === 'ps') {
-        term.write("\r\n");
         term.write(dockerContainers());
         setConsoleToNewLine();
     }
@@ -99,7 +93,6 @@ function taskInputHandle() {
             setConsoleToNewLine();
         } else {
             isWaitingForResponse = true
-            term.write("\r\n");
             term.write("WARNING! This will remove all stopped containers.\r\n" +
                 "Are you sure you want to continue? [y/N]");
         }

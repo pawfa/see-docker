@@ -6,7 +6,6 @@ const imagesArr = [];
 const containersArr = [];
 
 const dockerCommands = ["pull", "run", "rm", "ps", "images", "container"]
-const drawables = []
 
 let input = {
     command: '',

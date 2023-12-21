@@ -17,6 +17,27 @@ term.write('user@host:/$ ');
 const img = new Image();
 img.src = "./img/logo-docker.JPG";
 
+
+class Drawables {
+    elements = []
+
+    add(...elements) {
+        for (const element of elements) {
+            if (Array.isArray(element)) {
+                this.elements.push(...element)
+            } else {
+                this.elements.push(element)
+            }
+        }
+    }
+
+    drawAll() {
+        this.elements.forEach((drawable => drawable.draw()));
+    }
+}
+
+const drawables = new Drawables()
+
 function draw() {
     window.requestAnimationFrame(draw);
 
@@ -24,7 +45,7 @@ function draw() {
     ctx.globalAlpha = 0.1
     ctx.drawImage(img, 0, 0, img.width, img.height,0,10,img.width*0.8,img.height*0.8);
 
-    drawables.forEach((drawable => drawable.draw()));
+    drawables.drawAll();
 }
 term.onKey(function (event) {
     handleXtermInput(event, taskInputHandle);
@@ -55,14 +76,21 @@ function parseDockerCommand() {
                 }
             }
 
+            // TODO Fix docker run ubuntu echo "hello!" displaying "hello from container"
             if (newLine.startsWith('docker run')) {
                 lastCommand = 'docker run'
+                let echoCommand = ''
+                if (splitted[3] === 'echo') {
+                    const [,,,,...rest] = splitted
+                    echoCommand = rest.join(" ")
+                }
                 input = {
                     command: 'run',
                     name: splitted[2],
-                    args: splitted[3] ? [`echo "hello from container!"`]:[]
+                    args: splitted[3] === 'echo' ? [`${splitted[3]} ${echoCommand}`]:[]
                 }
             }
+            term.write("\r\n");
         } else {
             if (!input.command) {
                 term.write(getUnknownDockerCommand(commandName));
@@ -83,13 +111,13 @@ function dockerImages() {
 function dockerContainers() {
     const logs = ["CONTAINER ID  IMAGE          COMMAND                  CREATED         STATUS        PORTS     NAMES"];
 
-    for (const dockerImage of containersArr) {
+    for (const dockerContainer of containersArr) {
         if (!input.options) {
-            if(dockerImage.status !== 'exited'){
-                logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}         "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
+            if(dockerContainer.status !== 'exited' || dockerContainer.status !== 'removed'){
+                logs.push(`${dockerContainer.id.substring(0, 11)}   ${dockerContainer.name}         "/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
             }
         }else if (input.options.includes("-a")) {
-            logs.push(`${dockerImage.id.substring(0, 11)}   ${dockerImage.name}${new Array(15 -dockerImage.name.length).fill(0).map(()=> " ").join("")}"/docker-entrypoint.…"   4 seconds ago   Up 1 second   80/tcp    focused_johnson`);
+            logs.push(`${dockerContainer.id.substring(0, 11)}   ${dockerContainer.name}${new Array(15 -dockerContainer.name.length).fill(0).map(()=> " ").join("")}"/docker-entrypoint.…"   4 seconds ago   ${dockerContainer.status === 'exited'? "Exited" : "Up 1 second"}   80/tcp    focused_johnson`);
         }
     }
     return logs.join("\r\n");

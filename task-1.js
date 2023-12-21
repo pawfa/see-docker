@@ -1,12 +1,4 @@
-const helloWorldImage = new DockerImage({
-    position: {x: 550, y: 130},
-    imageSrc: "./img/hello-world-logo.png",
-    scale: 3,
-    name: "hello-world",
-    animations: {
-        pull : {movement:[['x', -200], ['y', 260], ['x', -150]]}
-    }
-});
+
 const host = new Container({
     position: {
         x: 100,
@@ -39,14 +31,20 @@ const registry = new Container({
     height: 140,
     label: "Registry (https://hub.docker.com)"
 });
-
-drawables.push(host,images,registry,...imagesArr)
+const helloWorldImage = new DockerImage({
+    position: {x: 550, y: 130},
+    imageSrc: "./img/hello-world-logo.png",
+    scale: 3,
+    name: "hello-world",
+    animations: {
+        pull : {movement:[['x', -200], ['y', 260], ['x', -150]]}
+    }
+});
 
 function taskInputHandle() {
     if (input.command === 'pull') {
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
-            term.write("\r\n");
             img.pull()
         } else {
             setConsoleToNewLine()
