@@ -1,4 +1,5 @@
 
+const currentTooltipStep = 1;
 const host = new Container({
     position: {
         x: 100,
@@ -29,8 +30,19 @@ const registry = new Container({
     },
     width: 270,
     height: 140,
-    label: "Registry (https://hub.docker.com)"
+    label: "Registry (https://hub.docker.com)",
+    tooltip : {
+        text: ["Registry is a place where Docker images are stored","before you download them to your machine.","It can be public like Docker Hub or you can have", "your own private repository."],
+        height: 95,
+        width: 350,
+        offset: {
+            x: 370,
+            y: -60
+        },
+        step: 1
+    }
 });
+
 const helloWorldImage = new DockerImage({
     position: {x: 550, y: 130},
     imageSrc: "./img/hello-world-logo.png",
@@ -38,17 +50,33 @@ const helloWorldImage = new DockerImage({
     name: "hello-world",
     animations: {
         pull : {movement:[['x', -200], ['y', 260], ['x', -150]]}
+    },
+    tooltip : {
+        text: ["It can be public like Docker Hub or you can have", "your own private repository."],
+        height: 95,
+        width: 350,
+        offset: {
+            x: 370,
+            y: 60
+        },
+        step: 2
     }
 });
-
+drawables.showOverlay()
+registry.isOverlayed = false
+helloWorldImage.isOverlayed = false
 function taskInputHandle() {
+
     if (input.command === 'pull') {
+
+
+
         const img = imagesArr.find((image)=> image.name === input.name)
-        if (img) {
-            img.pull()
-        } else {
-            setConsoleToNewLine()
-        }
+        // if (img) {
+        //     img.pull()
+        // } else {
+        //     setConsoleToNewLine()
+        // }
     }
 }
 

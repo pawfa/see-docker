@@ -1,51 +1,16 @@
-class Container {
-    constructor({position, width, height, label, style}) {
-        this.position = position;
-        this.width = width;
-        this.height = height;
-        this.label = label;
-        this.style = {
-            backgroundColor: '#E5F2FC',
-            strokeColor: '#1D63ED',
-            ...style
-        };
-        drawables.add(this)
-    }
-
-    draw() {
-        ctx.globalAlpha = 0.6;
-        ctx.fillStyle = this.style.backgroundColor;
-        ctx.beginPath();
-        ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.strokeStyle = this.style.strokeColor;
-        ctx.beginPath();
-        ctx.roundRect(this.position.x, this.position.y, this.width, this.height, [10]);
-        ctx.stroke();
-        ctx.fillStyle = '#00084D';
-        ctx.beginPath();
-        ctx.roundRect(this.position.x, this.position.y - 15, ctx.measureText(this.label).width + 20, 25, [10]);
-        ctx.fill();
-        ctx.font = "16px Roboto";
-        ctx.fillStyle = 'white';
-        ctx.fillText(this.label, this.position.x + 10, this.position.y + 2);
-    }
-}
-
 class DockerDrawable {
-    constructor({position, imageSrc, animations, scale}) {
+    constructor({position, imageSrc, animations, scale, tooltip}) {
         this.position = {...position};
         this.isHovered = false;
         this.image = new Image();
         this.image.src = imageSrc;
+        this.isOverlayed = true
         this.animations = animations;
         this.currentAnimations = [];
-        this.animationPosition = {
-            ...position,
-            i: 0,
-        };
+        this.animationPosition = {...position, i: 0};
         this.scale = scale;
+        this.tooltip = tooltip;
+
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect(),
                 x = e.clientX - rect.left,
@@ -138,13 +103,32 @@ class DockerDrawable {
 
         ctx.strokeRect(position.x - 5, position.y - 5, imageWidth + 10, imageHeight + 10);
         ctx.strokeStyle = 'black';
+        if (this.tooltip && this.tooltip.isVisible) {
+            this.drawTooltip()
+        }
+    }
+
+    drawTooltip() {
+        const x = this.position.x - this.tooltip.offset.x;
+        const y = this.position.y + this.tooltip.offset.y;
+        ctx.strokeStyle = 'black';
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.roundRect(x, y, this.tooltip.width, this.tooltip.height, [5]);
+        ctx.fill();
+        ctx.fillStyle = 'black';
+
+        for (let i = 0; i < this.tooltip.text.length; i++) {
+            ctx.font = "14px Roboto";
+            ctx.fillText(this.tooltip.text[i].trim(), x+10, y+20 + 20 * i);
+        }
     }
 }
 
 
 class DockerImage extends DockerDrawable {
-    constructor({position, imageSrc, animations, scale, name, logs}) {
-        super({position, imageSrc, animations,scale});
+    constructor({position, imageSrc, animations, scale, name, logs,tooltip}) {
+        super({position, imageSrc, animations,scale,tooltip});
         this.name = name;
         this.status = 'registry';
         this.id = crypto.randomUUID().replaceAll("-", '');
@@ -258,18 +242,19 @@ class DockerImage extends DockerDrawable {
 
 class DockerContainer extends DockerDrawable {
 
-    static runContainer({position, imageSrc, animations, scale, name, logs}) {
+    static runContainer({position, imageSrc, animations, scale, name, logs,tooltip}) {
         new DockerContainer({
             position: position,
             imageSrc: imageSrc,
             animations: animations,
             scale: scale,
             name: name,
-            logs: logs
+            logs: logs,
+            tooltip:tooltip
         }).run();
     }
 
-    constructor({position, imageSrc, animations, scale, name, logs}) {
+    constructor({position, imageSrc, animations, scale, name, logs,tooltip}) {
         super({
             position: position,
             imageSrc: imageSrc,

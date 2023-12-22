@@ -20,6 +20,27 @@ img.src = "./img/logo-docker.JPG";
 
 class Drawables {
     elements = []
+    overlayObj
+    constructor() {
+        this.overlayObj = {
+            isOn: false,
+            draw() {
+                if (this.isOn) {
+                    ctx.globalAlpha = 0.5
+                    ctx.fillStyle = 'black'
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalAlpha = 1
+                }
+            }
+        }
+    }
+
+    showOverlay() {
+        this.overlayObj.isOn = true
+    }
+    hideOverlay() {
+        this.overlayObj.isOn = false
+    }
 
     add(...elements) {
         for (const element of elements) {
@@ -32,7 +53,21 @@ class Drawables {
     }
 
     drawAll() {
-        this.elements.forEach((drawable => drawable.draw()));
+
+        if (!this.overlayObj.isOn) {
+            this.elements.forEach((drawable => drawable.draw()))
+        } else {
+            const overlayed = [];
+            const nonOverlayed = []
+            for (const element of this.elements) {
+                if(element.isOverlayed) {
+                    overlayed.push(element)
+                } else {
+                    nonOverlayed.push(element)
+                }
+            }
+            [...overlayed,this.overlayObj,...nonOverlayed].forEach((drawable => drawable.draw()));
+        }
     }
 }
 
