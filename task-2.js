@@ -72,9 +72,12 @@ const helloWorldImage = new DockerImage({
 helloWorldImage.setStatus('downloaded')
 
 async function taskInputHandle() {
+    console.log('asdasd')
     if (input.command === 'run') {
+
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
+
             await img.runImage()
         } else {
             setConsoleToNewLine()

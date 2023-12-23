@@ -1,5 +1,6 @@
-class DockerDrawable {
+class DockerDrawable extends Tooltip {
     constructor({position, imageSrc, animations, scale, tooltip}) {
+        super({position,tooltip})
         this.position = {...position};
         this.isHovered = false;
         this.image = new Image();
@@ -103,25 +104,7 @@ class DockerDrawable {
 
         ctx.strokeRect(position.x - 5, position.y - 5, imageWidth + 10, imageHeight + 10);
         ctx.strokeStyle = 'black';
-        if (this.tooltip && this.tooltip.isVisible) {
-            this.drawTooltip()
-        }
-    }
-
-    drawTooltip() {
-        const x = this.position.x - this.tooltip.offset.x;
-        const y = this.position.y + this.tooltip.offset.y;
-        ctx.strokeStyle = 'black';
-        ctx.fillStyle = 'white';
-        ctx.beginPath();
-        ctx.roundRect(x, y, this.tooltip.width, this.tooltip.height, [5]);
-        ctx.fill();
-        ctx.fillStyle = 'black';
-
-        for (let i = 0; i < this.tooltip.text.length; i++) {
-            ctx.font = "14px Roboto";
-            ctx.fillText(this.tooltip.text[i].trim(), x+10, y+20 + 20 * i);
-        }
+        this.drawTooltip()
     }
 }
 
