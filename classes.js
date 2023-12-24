@@ -6,6 +6,7 @@ class DockerDrawable extends Tooltip {
         this.image = new Image();
         this.image.src = imageSrc;
         this.isOverlayed = true
+        this.listeners = []
         this.animations = animations;
         this.currentAnimations = [];
         this.animationPosition = {...position, i: 0};
@@ -25,6 +26,21 @@ class DockerDrawable extends Tooltip {
             }
         });
         drawables.add(this)
+    }
+    onEvent(eventName,callback) {
+        this.listeners.push({
+            eventName,
+            callback
+        })
+    }
+
+    sendEvent(eventName) {
+        this.listeners.forEach((listener)=> {
+
+            if (listener.eventName === eventName) {
+                listener.callback()
+            }
+        })
     }
 
     runAnimation(animation) {
@@ -126,7 +142,6 @@ class DockerImage extends DockerDrawable {
             ...logs
         };
 
-        // TODO extract drawable logic to separate class to avoid pushing object to imagesarr twice when created new DockerContainer
         imagesArr.push(this)
     }
 
@@ -203,6 +218,7 @@ class DockerImage extends DockerDrawable {
                     name: this.name,
                     logs: this.logs
                 })
+                this.sendEvent("container-created")
                 clearInterval(intervalID)
             }
         },100)
@@ -259,7 +275,7 @@ class DockerContainer extends DockerDrawable {
             }
             if (i === this.logs['run'].length - 1) {
                 setTimeout(async () => {
-                    await this.setStatus('running', 500);
+                    await this.setStatus('running', 1000);
                     term.write(log);
                     if (input.args.length > 0) {
                         if (input.args[0].includes("echo")) {
@@ -276,11 +292,13 @@ class DockerContainer extends DockerDrawable {
         if (timeout !== undefined) {
             await new Promise((resolve) => {
                 this.status = status;
+                this.sendEvent("set-status-"+status)
                 setTimeout(() => {
                     resolve();
                 }, timeout);
             });
         } else {
+            this.sendEvent("set-status-"+status)
             this.status = status;
         }
     }
@@ -389,6 +407,7 @@ class DockerContainer extends DockerDrawable {
             }
         }
         this.animate();
+        this.drawTooltip()
         ctx.strokeStyle = '#00084D';
     }
 

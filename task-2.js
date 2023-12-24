@@ -72,13 +72,34 @@ const helloWorldImage = new DockerImage({
 helloWorldImage.setStatus('downloaded')
 
 async function taskInputHandle() {
-    console.log('asdasd')
     if (input.command === 'run') {
 
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
+            img.onEvent("container-created", ()=> {
+                // TODO Add tooltip from a constructor or with separate method for DockerContainer
+                containersArr[0].tooltip = {
+                    text: ["This is a representation of a Docker Container.","asdasdch contains","instructions useasdasda Docker container"],
+                    height: 75,
+                    width: 325,
+                    offset: {
+                        x: 370,
+                        y: 10
+                    },
+                    step: 1
+                }
 
+                containersArr[0].onEvent("set-status-exited",()=> {
+                    console.log('status-exited')
+                    Tooltip.start()
+                    Tooltip.on(1,()=> {
+                        drawables.showOverlay()
+                        containersArr[0].isOverlayed = false
+                    })
+                })
+            })
             await img.runImage()
+
         } else {
             setConsoleToNewLine()
         }
