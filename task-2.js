@@ -77,9 +77,9 @@ async function taskInputHandle() {
         const img = imagesArr.find((image)=> image.name === input.name)
         if (img) {
             img.onEvent("container-created", ()=> {
-                // TODO Add tooltip from a constructor or with separate method for DockerContainer
-                containersArr[0].tooltip = {
-                    text: ["This is a representation of a Docker Container.","asdasdch contains","instructions useasdasda Docker container"],
+
+                containersArr[0].addTooltip({
+                    text: ["This is a representation of a Docker Container.","lorem ipsum"],
                     height: 75,
                     width: 325,
                     offset: {
@@ -87,7 +87,7 @@ async function taskInputHandle() {
                         y: 10
                     },
                     step: 1
-                }
+                })
 
                 containersArr[0].onEvent("set-status-exited",()=> {
                     console.log('status-exited')

@@ -12,31 +12,35 @@ class Tooltip {
         this.tooltip = tooltip;
         this.position = position;
         if (this.tooltip) {
-            Tooltip.lastStep++
-            this.tooltip.position = {
-                x: this.position.x - tooltip.offset.x,
-                y: this.position.y + tooltip.offset.y
-            };
-            this.tooltip.button = {
-                position: {
-                    x: this.tooltip.position.x + this.tooltip.width - 60,
-                    y: this.tooltip.position.y + this.tooltip.height + 10
-                },
-                width: 60,
-                height: 30
-            };
-            canvas.addEventListener('click', (e) => {
-                const rect = canvas.getBoundingClientRect(),
-                    x = e.clientX - rect.left,
-                    y = e.clientY - rect.top;
-
-                if (x > this.tooltip.button.position.x && x < this.tooltip.button.position.x + 50 && y > this.tooltip.button.position.y && y < this.tooltip.button.position.y + 50) {
-                    Tooltip.currentStep++;
-                }
-            });
+            this.addTooltip(tooltip)
         }
     }
 
+    addTooltip(tooltip) {
+        this.tooltip = tooltip;
+        Tooltip.lastStep++
+        this.tooltip.position = {
+            x: this.position.x - tooltip.offset.x,
+            y: this.position.y + tooltip.offset.y
+        };
+        this.tooltip.button = {
+            position: {
+                x: this.tooltip.position.x + this.tooltip.width - 60,
+                y: this.tooltip.position.y + this.tooltip.height + 10
+            },
+            width: 60,
+            height: 30
+        };
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect(),
+                x = e.clientX - rect.left,
+                y = e.clientY - rect.top;
+
+            if (x > this.tooltip.button.position.x && x < this.tooltip.button.position.x + 50 && y > this.tooltip.button.position.y && y < this.tooltip.button.position.y + 50) {
+                Tooltip.currentStep++;
+            }
+        });
+    }
     static onEnd(callback, timeout) {
         this.endCallbacks.push({timeout: timeout, callback: callback})
     }
