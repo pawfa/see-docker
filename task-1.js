@@ -90,9 +90,6 @@ Tooltip.on(3,()=> {
     host.isOverlayed = false
     images.isOverlayed = false
 })
-Tooltip.on(4, ()=> {
-    drawables.hideOverlay()
-})
 
 function taskInputHandle() {
 

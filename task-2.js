@@ -70,6 +70,9 @@ const helloWorldImage = new DockerImage({
     }
 });
 helloWorldImage.setStatus('downloaded')
+Tooltip.onEnd(()=> {
+    drawables.hideOverlay()
+})
 
 async function taskInputHandle() {
     if (input.command === 'run') {
@@ -84,7 +87,7 @@ async function taskInputHandle() {
                     width: 325,
                     offset: {
                         x: 370,
-                        y: 10
+                        y: 70
                     },
                     step: 1
                 })
