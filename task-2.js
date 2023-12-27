@@ -82,7 +82,7 @@ async function taskInputHandle() {
             img.onEvent("container-created", ()=> {
 
                 containersArr[0].addTooltip({
-                    text: ["This is a representation of a Docker Container.","lorem ipsum"],
+                    text: ["This is a representation of a Docker Container.","Container is an isolated environment for your code.","It contains everything that your code needs in order to run."],
                     height: 75,
                     width: 325,
                     offset: {

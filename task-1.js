@@ -6,7 +6,7 @@ const host = new Container({
     width: 200,
     height: 200,
     label: "Host",
-    tooltip : {
+    tooltips: [{
         text: ["Host is a machine (physical or virtual) where","Docker is installed and which is responsible"," for, among other things, running containers"," and managing your local images."],
         height: 95,
         width: 325,
@@ -15,7 +15,7 @@ const host = new Container({
             y: 0
         },
         step: 3
-    }
+    }]
 });
 
 const images = new Container({
@@ -39,7 +39,7 @@ const registry = new Container({
     width: 270,
     height: 140,
     label: "Registry (https://hub.docker.com)",
-    tooltip : {
+    tooltips: [{
         text: ["Registry is a place where Docker images are stored","before you download them to your machine.","It can be public like Docker Hub or you can have", "your own private repository."],
         height: 95,
         width: 350,
@@ -48,7 +48,7 @@ const registry = new Container({
             y: -60
         },
         step: 1
-    }
+    }]
 });
 
 const helloWorldImage = new DockerImage({
@@ -59,7 +59,7 @@ const helloWorldImage = new DockerImage({
     animations: {
         pull : {movement:[['x', -200], ['y', 260], ['x', -150]]}
     },
-    tooltip : {
+    tooltips: [{
         text: ["This is a representation of a Docker Image.","An image is a read-only template which contains","instructions used for creating a Docker container"],
         height: 75,
         width: 325,
@@ -68,7 +68,7 @@ const helloWorldImage = new DockerImage({
             y: 10
         },
         step: 2
-    }
+    }]
 });
 
 Tooltip.on(1,()=> {

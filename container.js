@@ -1,6 +1,6 @@
 class Container extends Tooltip {
-    constructor({position, width, height, label, style, tooltip}) {
-        super({tooltip, position})
+    constructor({position, width, height, label, style, tooltips}) {
+        super({tooltips, position})
         this.position = position;
         this.width = width;
         this.height = height;

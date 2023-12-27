@@ -1,6 +1,6 @@
 class DockerDrawable extends Tooltip {
-    constructor({position, imageSrc, animations, scale, tooltip}) {
-        super({position,tooltip})
+    constructor({position, imageSrc, animations, scale, tooltips}) {
+        super({position,tooltips})
         this.position = {...position};
         this.isHovered = false;
         this.image = new Image();
@@ -11,7 +11,6 @@ class DockerDrawable extends Tooltip {
         this.currentAnimations = [];
         this.animationPosition = {...position, i: 0};
         this.scale = scale;
-        this.tooltip = tooltip;
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect(),
@@ -126,8 +125,8 @@ class DockerDrawable extends Tooltip {
 
 
 class DockerImage extends DockerDrawable {
-    constructor({position, imageSrc, animations, scale, name, logs,tooltip}) {
-        super({position, imageSrc, animations,scale,tooltip});
+    constructor({position, imageSrc, animations, scale, name, logs,tooltips}) {
+        super({position, imageSrc, animations,scale,tooltips});
         this.name = name;
         this.status = 'registry';
         this.id = crypto.randomUUID().replaceAll("-", '');
@@ -241,24 +240,24 @@ class DockerImage extends DockerDrawable {
 
 class DockerContainer extends DockerDrawable {
 
-    static runContainer({position, imageSrc, animations, scale, name, logs,tooltip}) {
+    static runContainer({position, imageSrc, animations, scale, name, logs}) {
         new DockerContainer({
             position: position,
             imageSrc: imageSrc,
             animations: animations,
             scale: scale,
             name: name,
-            logs: logs,
-            tooltip:tooltip
+            logs: logs
         }).run();
     }
 
-    constructor({position, imageSrc, animations, scale, name, logs,tooltip}) {
+    constructor({position, imageSrc, animations, scale, name, logs,tooltips}) {
         super({
             position: position,
             imageSrc: imageSrc,
             animations: animations,
-            scale: scale
+            scale: scale,
+            tooltips: tooltips
         });
         this.id = crypto.randomUUID().replaceAll("-", '');
         this.status = 'created'
