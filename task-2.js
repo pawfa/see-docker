@@ -84,12 +84,22 @@ async function taskInputHandle() {
                 containersArr[0].addTooltip({
                     text: ["This is a representation of a Docker Container.","Container is an isolated environment for your code.","It contains everything that your code needs in order to run."],
                     height: 75,
-                    width: 325,
+                    width: 380,
                     offset: {
                         x: 370,
                         y: 70
                     },
                     step: 1
+                });
+                containersArr[0].addTooltip({
+                    text: ["After executing docker run hello-world command","new container has started based on the hello-world image","Container has run for a short period of time, executed all the code","and the main process within stopped - resulting in a container with status exited."],
+                    height: 95,
+                    width: 520,
+                    offset: {
+                        x: 370,
+                        y: 70
+                    },
+                    step: 2
                 })
 
                 containersArr[0].onEvent("set-status-exited",()=> {
